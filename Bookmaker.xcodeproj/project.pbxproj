@@ -14,6 +14,11 @@
 		AB0000010000000000000105 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000005 /* ContentView.swift */; };
 		AB0000010000000000000106 /* PDFPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000006 /* PDFPreviewView.swift */; };
 		AB0000010000000000000107 /* PageSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000007 /* PageSetupView.swift */; };
+		AB0000010000000000000110 /* LaTeXEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000010 /* LaTeXEditor.swift */; };
+		AB0000010000000000000111 /* LaTeXCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000011 /* LaTeXCommands.swift */; };
+		AB0000010000000000000112 /* BookmakerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000012 /* BookmakerCommands.swift */; };
+		AB0000010000000000000113 /* LaTeXInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000013 /* LaTeXInstaller.swift */; };
+		AB0000010000000000000114 /* LaTeXInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000014 /* LaTeXInstallView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +30,11 @@
 		AB0000010000000000000006 /* PDFPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreviewView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000007 /* PageSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageSetupView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB0000010000000000000010 /* LaTeXEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXEditor.swift; sourceTree = "<group>"; };
+		AB0000010000000000000011 /* LaTeXCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXCommands.swift; sourceTree = "<group>"; };
+		AB0000010000000000000012 /* BookmakerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmakerCommands.swift; sourceTree = "<group>"; };
+		AB0000010000000000000013 /* LaTeXInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXInstaller.swift; sourceTree = "<group>"; };
+		AB0000010000000000000014 /* LaTeXInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXInstallView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -57,6 +67,11 @@
 				AB0000010000000000000005 /* ContentView.swift */,
 				AB0000010000000000000006 /* PDFPreviewView.swift */,
 				AB0000010000000000000007 /* PageSetupView.swift */,
+				AB0000010000000000000010 /* LaTeXEditor.swift */,
+				AB0000010000000000000011 /* LaTeXCommands.swift */,
+				AB0000010000000000000012 /* BookmakerCommands.swift */,
+				AB0000010000000000000013 /* LaTeXInstaller.swift */,
+				AB0000010000000000000014 /* LaTeXInstallView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -145,6 +160,11 @@
 				AB0000010000000000000105 /* ContentView.swift in Sources */,
 				AB0000010000000000000106 /* PDFPreviewView.swift in Sources */,
 				AB0000010000000000000107 /* PageSetupView.swift in Sources */,
+				AB0000010000000000000110 /* LaTeXEditor.swift in Sources */,
+				AB0000010000000000000111 /* LaTeXCommands.swift in Sources */,
+				AB0000010000000000000112 /* BookmakerCommands.swift in Sources */,
+				AB0000010000000000000113 /* LaTeXInstaller.swift in Sources */,
+				AB0000010000000000000114 /* LaTeXInstallView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

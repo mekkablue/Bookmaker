@@ -7,6 +7,7 @@ final class TypesetController: ObservableObject {
 	@Published var isTypesetting = false
 	@Published var lastError: String?
 	@Published var log = ""
+	@Published var engineMissing = false
 
 	private let workDirectory: URL
 	private var queuedSource: String?
@@ -37,6 +38,7 @@ final class TypesetController: ObservableObject {
 		isTypesetting = false
 		log = result.log
 		lastError = result.errorMessage
+		engineMissing = result.engineMissing
 		if let data = result.pdfData, let pdf = PDFDocument(data: data) {
 			pdfDocument = pdf
 		}

@@ -7,7 +7,8 @@ A small LaTeX-based layout editor for typesetting a book, as a native Mac app (S
 ## Requirements
 
 - macOS 13 Ventura or later, Xcode 15 or later to build.
-- A TeX distribution providing `pdflatex`: [MacTeX or BasicTeX](https://tug.org/mactex/). Bookmaker looks in `/Library/TeX/texbin`, Homebrew paths, and finally asks your login shell.
+- A `pdflatex`. If none is found, Bookmaker offers a **one-click install of TinyTeX** (~120 MB download, no admin password) into `~/Library/Application Support/Bookmaker/TinyTeX`. A system-wide [MacTeX or BasicTeX](https://tug.org/mactex/) takes precedence if present: Bookmaker looks in `/Library/TeX/texbin`, Homebrew paths, then the managed TinyTeX, and finally asks your login shell.
+- The default template only uses `geometry` (included in TinyTeX). If your templates use packages TinyTeX lacks, install them with `~/Library/Application Support/Bookmaker/TinyTeX/bin/*/tlmgr install <package>` — or install full MacTeX.
 
 ## Build & Run
 
@@ -35,9 +36,10 @@ On typeset, the templates and body are assembled into one `main.tex` via placeho
 ## UI
 
 - **Editor pane** with a picker to switch between Body, Spread Template, and TOC Template. Templates have a *Reset to Default* button.
+- **Backslash autocompletion**: type `\` and a popup lists LaTeX commands, narrowing as you type; Escape or F5 reopens it. Smart quotes/dashes are off in the editor, so LaTeX source stays intact.
 - **Page setup bar** (toggleable) for paper size and margins. Change a margin, and the whole multipage document reflows.
-- **PDF preview** in an optional split view (toolbar toggle), with *Single Pages* or *Spreads* display, keeping your reading position across reflows.
-- **Typeset** button (⌘R) plus an *Auto Typeset* toggle that re-typesets ~1 second after you stop editing.
+- **PDF preview** in an optional split view, with *Single Pages* or *Spreads* display, keeping your reading position across reflows.
+- **Menus**: *View > Show/Hide PDF Preview* (⌥⌘P) and *Show/Hide Page Setup* (⌥⌘M); *Typeset > Typeset* (⌘R) and *Auto Typeset* — mirrored in the toolbar. Auto Typeset rebuilds ~1 second after you stop editing.
 - Errors show a summary bar with the full LaTeX log one click away.
 
 ## Not Yet (Ideas for Later)

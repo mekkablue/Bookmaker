@@ -27,14 +27,10 @@ enum DefaultTemplates {
 	static let spread = #"""
 	\documentclass[11pt,twoside,openright]{book}
 	\usepackage[{{GEOMETRY}}]{geometry}
-	\usepackage{fancyhdr}
-	\setlength{\headheight}{14pt}
-	\pagestyle{fancy}
-	\fancyhf{}
-	\fancyhead[LE]{\small\itshape\leftmark}
-	\fancyhead[RO]{\small\itshape\rightmark}
-	\fancyfoot[LE,RO]{\small\thepage}
-	\renewcommand{\headrulewidth}{0pt}
+	% running heads with page numbers, built into the book class;
+	% needs no packages, so it works with the bundled TinyTeX.
+	% With a full MacTeX you can switch to \usepackage{fancyhdr} here.
+	\pagestyle{headings}
 
 	\begin{document}
 

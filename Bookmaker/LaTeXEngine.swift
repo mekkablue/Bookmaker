@@ -4,6 +4,7 @@ struct TypesetResult {
 	var pdfData: Data?
 	var log: String
 	var errorMessage: String?
+	var engineMissing = false
 }
 
 enum LaTeXEngine {
@@ -14,9 +15,34 @@ enum LaTeXEngine {
 		"/usr/texbin/pdflatex",
 	]
 
+	/// Root folder for the app-managed TinyTeX installation (~/Library/Application Support/Bookmaker).
+	static var managedInstallRoot: URL {
+		let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+			?? FileManager.default.temporaryDirectory
+		return appSupport.appendingPathComponent("Bookmaker", isDirectory: true)
+	}
+
+	/// pdflatex inside the app-managed TinyTeX, if installed (platform folder varies, e.g. universal-darwin).
+	static var managedEnginePath: String? {
+		let binRoot = managedInstallRoot.appendingPathComponent("TinyTeX/bin", isDirectory: true)
+		guard let platforms = try? FileManager.default.contentsOfDirectory(atPath: binRoot.path) else {
+			return nil
+		}
+		for platform in platforms {
+			let candidate = binRoot.appendingPathComponent(platform).appendingPathComponent("pdflatex").path
+			if FileManager.default.isExecutableFile(atPath: candidate) {
+				return candidate
+			}
+		}
+		return nil
+	}
+
 	static func findEngine() -> String? {
 		for path in engineCandidates where FileManager.default.isExecutableFile(atPath: path) {
 			return path
+		}
+		if let managed = managedEnginePath {
+			return managed
 		}
 		// last resort: the user's login shell may know a PATH that the app does not
 		let process = Process()
@@ -46,7 +72,8 @@ enum LaTeXEngine {
 			return TypesetResult(
 				pdfData: nil,
 				log: "",
-				errorMessage: "No pdflatex found. Install MacTeX or BasicTeX from https://tug.org/mactex/"
+				errorMessage: "No pdflatex found.",
+				engineMissing: true
 			)
 		}
 		let pdfURL = directory.appendingPathComponent("main.pdf")

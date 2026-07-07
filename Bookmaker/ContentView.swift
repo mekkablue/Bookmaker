@@ -4,6 +4,7 @@ import PDFKit
 struct ContentView: View {
 	@Binding var document: BookDocument
 	@StateObject private var typesetter = TypesetController()
+	@StateObject private var installer = LaTeXInstaller()
 	@State private var editedSource: EditedSource = .bodyText
 	@State private var previewMode: PreviewMode = .spreads
 	@State private var showPreview = true
@@ -49,7 +50,6 @@ struct ContentView: View {
 					Label("Typeset", systemImage: "play.fill")
 				}
 				.help("Typeset the book with pdflatex (⌘R)")
-				.keyboardShortcut("r", modifiers: .command)
 				.disabled(typesetter.isTypesetting)
 				Toggle(isOn: $autoTypeset) {
 					Label("Auto Typeset", systemImage: "arrow.triangle.2.circlepath")
@@ -65,6 +65,10 @@ struct ContentView: View {
 				.help("Show the PDF preview in a split view")
 			}
 		}
+		.focusedSceneValue(\.typesetAction, typeset)
+		.focusedSceneValue(\.showPreview, $showPreview)
+		.focusedSceneValue(\.showPageSetup, $showPageSetup)
+		.focusedSceneValue(\.autoTypeset, $autoTypeset)
 		.onAppear {
 			typeset()
 		}
@@ -94,9 +98,7 @@ struct ContentView: View {
 			}
 			.padding(8)
 			Divider()
-			TextEditor(text: sourceBinding)
-				.font(.system(size: 12, design: .monospaced))
-				.autocorrectionDisabled()
+			LaTeXEditor(text: sourceBinding)
 			if showPageSetup {
 				Divider()
 				PageSetupView(settings: $document.settings)
@@ -148,7 +150,11 @@ struct ContentView: View {
 			}
 			.padding(8)
 			Divider()
-			if let pdf = typesetter.pdfDocument {
+			if typesetter.engineMissing {
+				LaTeXInstallView(installer: installer) {
+					typeset()
+				}
+			} else if let pdf = typesetter.pdfDocument {
 				PDFPreviewView(document: pdf, displayMode: previewMode.pdfDisplayMode)
 			} else if typesetter.isTypesetting {
 				Spacer()
@@ -160,7 +166,7 @@ struct ContentView: View {
 					.foregroundColor(.secondary)
 				Spacer()
 			}
-			if let error = typesetter.lastError {
+			if let error = typesetter.lastError, !typesetter.engineMissing {
 				Divider()
 				errorBar(error)
 			}

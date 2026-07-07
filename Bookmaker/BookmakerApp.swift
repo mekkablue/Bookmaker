@@ -7,5 +7,8 @@ struct BookmakerApp: App {
 			ContentView(document: file.$document)
 		}
 		.defaultSize(width: 1150, height: 760)
+		.commands {
+			BookmakerCommands()
+		}
 	}
 }
