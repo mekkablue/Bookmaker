@@ -46,7 +46,7 @@ final class LaTeXInstaller: ObservableObject {
 		}
 	}
 
-	private static func unpack(archive: URL) throws {
+	private nonisolated static func unpack(archive: URL) throws {
 		let fileManager = FileManager.default
 		let root = LaTeXEngine.managedInstallRoot
 		try fileManager.createDirectory(at: root, withIntermediateDirectories: true)
