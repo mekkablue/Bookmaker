@@ -19,6 +19,9 @@
 		AB0000010000000000000112 /* BookmakerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000012 /* BookmakerCommands.swift */; };
 		AB0000010000000000000113 /* LaTeXInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000013 /* LaTeXInstaller.swift */; };
 		AB0000010000000000000114 /* LaTeXInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000014 /* LaTeXInstallView.swift */; };
+		AB0000010000000000000115 /* FontSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000015 /* FontSettings.swift */; };
+		AB0000010000000000000116 /* FontSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000016 /* FontSettingsView.swift */; };
+		AB0000010000000000000117 /* GUICanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000017 /* GUICanvasView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +38,9 @@
 		AB0000010000000000000012 /* BookmakerCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmakerCommands.swift; sourceTree = "<group>"; };
 		AB0000010000000000000013 /* LaTeXInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXInstaller.swift; sourceTree = "<group>"; };
 		AB0000010000000000000014 /* LaTeXInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXInstallView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000015 /* FontSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettings.swift; sourceTree = "<group>"; };
+		AB0000010000000000000016 /* FontSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettingsView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000017 /* GUICanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUICanvasView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -72,6 +78,9 @@
 				AB0000010000000000000012 /* BookmakerCommands.swift */,
 				AB0000010000000000000013 /* LaTeXInstaller.swift */,
 				AB0000010000000000000014 /* LaTeXInstallView.swift */,
+				AB0000010000000000000015 /* FontSettings.swift */,
+				AB0000010000000000000016 /* FontSettingsView.swift */,
+				AB0000010000000000000017 /* GUICanvasView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -165,6 +174,9 @@
 				AB0000010000000000000112 /* BookmakerCommands.swift in Sources */,
 				AB0000010000000000000113 /* LaTeXInstaller.swift in Sources */,
 				AB0000010000000000000114 /* LaTeXInstallView.swift in Sources */,
+				AB0000010000000000000115 /* FontSettings.swift in Sources */,
+				AB0000010000000000000116 /* FontSettingsView.swift in Sources */,
+				AB0000010000000000000117 /* GUICanvasView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
