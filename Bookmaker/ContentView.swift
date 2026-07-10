@@ -5,13 +5,21 @@ struct ContentView: View {
 	@Binding var document: BookDocument
 	@StateObject private var typesetter = TypesetController()
 	@StateObject private var installer = LaTeXInstaller()
+	@State private var editorMode: EditorMode = .text
 	@State private var editedSource: EditedSource = .bodyText
 	@State private var previewMode: PreviewMode = .spreads
 	@State private var showPreview = true
 	@State private var showPageSetup = true
+	@State private var showFontSettings = false
 	@State private var autoTypeset = true
 	@State private var showLog = false
 	@State private var pendingTypeset: Task<Void, Never>?
+
+	enum EditorMode: String, CaseIterable, Identifiable {
+		case text = "Text"
+		case gui = "GUI"
+		var id: String { rawValue }
+	}
 
 	enum EditedSource: String, CaseIterable, Identifiable {
 		case bodyText = "Body"
@@ -68,7 +76,11 @@ struct ContentView: View {
 		.focusedSceneValue(\.typesetAction, typeset)
 		.focusedSceneValue(\.showPreview, $showPreview)
 		.focusedSceneValue(\.showPageSetup, $showPageSetup)
+		.focusedSceneValue(\.showFontSettings, $showFontSettings)
 		.focusedSceneValue(\.autoTypeset, $autoTypeset)
+		.sheet(isPresented: $showFontSettings) {
+			FontSettingsView(fonts: $document.fonts)
+		}
 		.onAppear {
 			typeset()
 		}
@@ -82,26 +94,41 @@ struct ContentView: View {
 	private var editorPane: some View {
 		VStack(spacing: 0) {
 			HStack {
-				Picker("", selection: $editedSource) {
-					ForEach(EditedSource.allCases) { source in
-						Text(source.rawValue).tag(source)
+				Picker("", selection: $editorMode) {
+					ForEach(EditorMode.allCases) { mode in
+						Text(mode.rawValue).tag(mode)
 					}
 				}
 				.pickerStyle(.segmented)
 				.labelsHidden()
-				if editedSource != .bodyText {
-					Button("Reset to Default") {
-						resetCurrentTemplate()
+				.frame(width: 130)
+				if editorMode == .text {
+					Divider().frame(height: 16)
+					Picker("", selection: $editedSource) {
+						ForEach(EditedSource.allCases) { source in
+							Text(source.rawValue).tag(source)
+						}
 					}
-					.help("Replace this template with the built-in default")
+					.pickerStyle(.segmented)
+					.labelsHidden()
+					if editedSource != .bodyText {
+						Button("Reset to Default") {
+							resetCurrentTemplate()
+						}
+						.help("Replace this template with the built-in default")
+					}
 				}
 			}
 			.padding(8)
 			Divider()
-			LaTeXEditor(text: sourceBinding)
-			if showPageSetup {
-				Divider()
-				PageSetupView(settings: $document.settings)
+			if editorMode == .text {
+				LaTeXEditor(text: sourceBinding)
+				if showPageSetup {
+					Divider()
+					PageSetupView(settings: $document.settings)
+				}
+			} else {
+				GUICanvasView(settings: $document.settings, bodyText: $document.bodyText)
 			}
 		}
 	}

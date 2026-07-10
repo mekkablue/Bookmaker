@@ -12,6 +12,10 @@ struct ShowPageSetupKey: FocusedValueKey {
 	typealias Value = Binding<Bool>
 }
 
+struct ShowFontSettingsKey: FocusedValueKey {
+	typealias Value = Binding<Bool>
+}
+
 struct AutoTypesetKey: FocusedValueKey {
 	typealias Value = Binding<Bool>
 }
@@ -32,6 +36,11 @@ extension FocusedValues {
 		set { self[ShowPageSetupKey.self] = newValue }
 	}
 
+	var showFontSettings: ShowFontSettingsKey.Value? {
+		get { self[ShowFontSettingsKey.self] }
+		set { self[ShowFontSettingsKey.self] = newValue }
+	}
+
 	var autoTypeset: AutoTypesetKey.Value? {
 		get { self[AutoTypesetKey.self] }
 		set { self[AutoTypesetKey.self] = newValue }
@@ -43,6 +52,7 @@ struct BookmakerCommands: Commands {
 	@FocusedValue(\.typesetAction) private var typesetAction
 	@FocusedValue(\.showPreview) private var showPreview
 	@FocusedValue(\.showPageSetup) private var showPageSetup
+	@FocusedValue(\.showFontSettings) private var showFontSettings
 	@FocusedValue(\.autoTypeset) private var autoTypeset
 
 	var body: some Commands {
@@ -58,6 +68,12 @@ struct BookmakerCommands: Commands {
 			}
 			.keyboardShortcut("m", modifiers: [.command, .option])
 			.disabled(showPageSetup == nil)
+
+			Button("Edit Fonts…") {
+				showFontSettings?.wrappedValue = true
+			}
+			.keyboardShortcut("f", modifiers: [.command, .option])
+			.disabled(showFontSettings == nil)
 
 			Divider()
 		}
