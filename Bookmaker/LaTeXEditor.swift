@@ -2,9 +2,11 @@ import SwiftUI
 import AppKit
 
 /// Plain-text LaTeX editor: an NSTextView with all smart substitutions off
-/// (smart quotes would corrupt LaTeX source) and autocompletion for
-/// backslash commands. The completion popup opens as soon as you type a
-/// backslash and narrows while you type; Escape or F5 reopens it manually.
+/// (smart quotes would corrupt LaTeX source) and two kinds of autocompletion.
+/// Typing a backslash opens a popup of LaTeX commands automatically, narrowing
+/// as you type. Pressing Escape while inside any other word opens a popup of
+/// completions drawn from every word already typed elsewhere in the document,
+/// so recurring names and terms complete without a fixed dictionary.
 struct LaTeXEditor: NSViewRepresentable {
 	@Binding var text: String
 
@@ -68,11 +70,31 @@ struct LaTeXEditor: NSViewRepresentable {
 
 		func textView(_ textView: NSTextView, completions words: [String], forPartialWordRange charRange: NSRange, indexOfSelectedItem index: UnsafeMutablePointer<Int>?) -> [String] {
 			let partialToken = (textView.string as NSString).substring(with: charRange)
-			guard partialToken.hasPrefix("\\") else {
+			if partialToken.hasPrefix("\\") {
+				index?.pointee = -1  // no preselection, so Return while typing does not insert by surprise
+				return LaTeXCommands.all.filter { $0.hasPrefix(partialToken) }
+			}
+			guard !partialToken.isEmpty else {
 				return words
 			}
-			index?.pointee = -1  // no preselection, so Return while typing does not insert by surprise
-			return LaTeXCommands.all.filter { $0.hasPrefix(partialToken) }
+			index?.pointee = -1
+			return Self.wordsTyped(in: textView.string, matching: partialToken)
+		}
+
+		/// Every distinct word already typed in the document that starts with
+		/// `prefix` (case-insensitively), excluding the word being typed itself.
+		private static func wordsTyped(in text: String, matching prefix: String) -> [String] {
+			var found = Set<String>()
+			text.enumerateSubstrings(in: text.startIndex..<text.endIndex, options: [.byWords, .localized]) { substring, _, _, _ in
+				guard let word = substring, word.count > 1 else {
+					return
+				}
+				found.insert(word)
+			}
+			let lowerPrefix = prefix.lowercased()
+			return found
+				.filter { $0.lowercased().hasPrefix(lowerPrefix) && $0.caseInsensitiveCompare(prefix) != .orderedSame }
+				.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
 		}
 	}
 }
