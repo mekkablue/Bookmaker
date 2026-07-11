@@ -8,6 +8,7 @@ final class TypesetController: ObservableObject {
 	@Published var lastError: String?
 	@Published var log = ""
 	@Published var engineMissing = false
+	@Published var tocEntries: [TOCEntry] = []
 
 	private let workDirectory: URL
 	private var queuedSource: (source: String, engine: LaTeXEngineKind)?
@@ -41,6 +42,7 @@ final class TypesetController: ObservableObject {
 		engineMissing = result.engineMissing
 		if let data = result.pdfData, let pdf = PDFDocument(data: data) {
 			pdfDocument = pdf
+			tocEntries = TOCFileParser.parseFile(at: workDirectory.appendingPathComponent("main.toc"))
 		}
 		if let queued = queuedSource {
 			queuedSource = nil

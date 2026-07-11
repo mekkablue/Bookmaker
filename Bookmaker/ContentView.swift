@@ -14,6 +14,7 @@ struct ContentView: View {
 	@State private var showFootnoteSettings = false
 	@State private var showCrossReferenceSettings = false
 	@State private var showCrossReferenceInsert = false
+	@State private var showTOCBuilder = false
 	@State private var autoTypeset = true
 	@State private var showLog = false
 	@State private var pendingTypeset: Task<Void, Never>?
@@ -87,6 +88,7 @@ struct ContentView: View {
 		.focusedSceneValue(\.insertReferenceMarkAction, insertReferenceMark)
 		.focusedSceneValue(\.showCrossReferenceInsert, $showCrossReferenceInsert)
 		.focusedSceneValue(\.showCrossReferenceSettings, $showCrossReferenceSettings)
+		.focusedSceneValue(\.showTOCBuilder, $showTOCBuilder)
 		.sheet(isPresented: $showFontSettings) {
 			FontSettingsView(fonts: $document.fonts)
 		}
@@ -100,6 +102,11 @@ struct ContentView: View {
 			CrossReferenceInsertView(bodyText: document.bodyText, introWord: document.crossReferences.introWord) { label in
 				let text = document.crossReferences.referenceSnippet(to: label)
 				insertIntoBody(EditorSnippet(text: text, caretOffset: text.count))
+			}
+		}
+		.sheet(isPresented: $showTOCBuilder) {
+			TOCBuilderView(settings: $document.tocBuilder, entries: typesetter.tocEntries) { generated in
+				insertGeneratedTOC(generated)
 			}
 		}
 		.onAppear {
@@ -206,6 +213,34 @@ struct ContentView: View {
 			let separator = document.bodyText.isEmpty || document.bodyText.hasSuffix("\n\n") ? "" : "\n\n"
 			document.bodyText += separator + snippet.text
 		}
+	}
+
+	// MARK: - Table of contents
+
+	private static let generatedTOCStart = "% BOOKMAKER GENERATED TOC"
+	private static let generatedTOCEnd = "% BOOKMAKER GENERATED TOC END"
+
+	/// Replaces a previously inserted block in place (so clicking Insert
+	/// again after retypesetting just refreshes the page numbers), or
+	/// replaces `\tableofcontents` the first time, or appends as a fallback.
+	private func insertGeneratedTOC(_ generated: String) {
+		let block = "\(Self.generatedTOCStart)\n\(generated)\n\(Self.generatedTOCEnd)"
+		if let existingRange = rangeOfGeneratedTOCBlock(in: document.tocTemplate) {
+			document.tocTemplate.replaceSubrange(existingRange, with: block)
+		} else if let tocRange = document.tocTemplate.range(of: #"\tableofcontents"#) {
+			document.tocTemplate.replaceSubrange(tocRange, with: block)
+		} else {
+			let separator = document.tocTemplate.isEmpty || document.tocTemplate.hasSuffix("\n\n") ? "" : "\n\n"
+			document.tocTemplate += separator + block
+		}
+	}
+
+	private func rangeOfGeneratedTOCBlock(in text: String) -> Range<String.Index>? {
+		guard let start = text.range(of: Self.generatedTOCStart),
+			  let end = text.range(of: Self.generatedTOCEnd, range: start.upperBound..<text.endIndex) else {
+			return nil
+		}
+		return start.lowerBound..<end.upperBound
 	}
 
 	// MARK: - Preview

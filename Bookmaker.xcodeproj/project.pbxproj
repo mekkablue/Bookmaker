@@ -32,6 +32,8 @@
 		AB0000010000000000000125 /* CrossReferenceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000025 /* CrossReferenceSettings.swift */; };
 		AB0000010000000000000126 /* CrossReferenceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000026 /* CrossReferenceSettingsView.swift */; };
 		AB0000010000000000000127 /* CrossReferenceInsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000027 /* CrossReferenceInsertView.swift */; };
+		AB0000010000000000000128 /* TOCSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000028 /* TOCSettings.swift */; };
+		AB0000010000000000000129 /* TOCBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000029 /* TOCBuilderView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +63,8 @@
 		AB0000010000000000000025 /* CrossReferenceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceSettings.swift; sourceTree = "<group>"; };
 		AB0000010000000000000026 /* CrossReferenceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceSettingsView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000027 /* CrossReferenceInsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceInsertView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000028 /* TOCSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCSettings.swift; sourceTree = "<group>"; };
+		AB0000010000000000000029 /* TOCBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCBuilderView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -111,6 +115,8 @@
 				AB0000010000000000000025 /* CrossReferenceSettings.swift */,
 				AB0000010000000000000026 /* CrossReferenceSettingsView.swift */,
 				AB0000010000000000000027 /* CrossReferenceInsertView.swift */,
+				AB0000010000000000000028 /* TOCSettings.swift */,
+				AB0000010000000000000029 /* TOCBuilderView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -217,6 +223,8 @@
 				AB0000010000000000000125 /* CrossReferenceSettings.swift in Sources */,
 				AB0000010000000000000126 /* CrossReferenceSettingsView.swift in Sources */,
 				AB0000010000000000000127 /* CrossReferenceInsertView.swift in Sources */,
+				AB0000010000000000000128 /* TOCSettings.swift in Sources */,
+				AB0000010000000000000129 /* TOCBuilderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
