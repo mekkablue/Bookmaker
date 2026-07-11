@@ -74,7 +74,7 @@ final class LaTeXInstaller: ObservableObject {
 			try fileManager.moveItem(at: hidden, to: root.appendingPathComponent("TinyTeX"))
 		}
 
-		guard let engine = LaTeXEngine.managedEnginePath, fileManager.isExecutableFile(atPath: engine) else {
+		guard let engine = LaTeXEngine.managedEnginePath(.pdflatex), fileManager.isExecutableFile(atPath: engine) else {
 			throw NSError(domain: "Bookmaker", code: 1, userInfo: [
 				NSLocalizedDescriptionKey: "TinyTeX unpacked, but pdflatex was not found inside."
 			])
