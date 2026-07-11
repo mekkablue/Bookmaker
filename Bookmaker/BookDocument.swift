@@ -95,6 +95,7 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	var pageNumbers = PageNumberSettings()
 	var footnotes = FootnoteSettings()
 	var crossReferences = CrossReferenceSettings()
+	var tocBuilder = TOCSettings()
 	var spreadTemplate = DefaultTemplates.spread
 	var tocTemplate = DefaultTemplates.toc
 	var bodyText = DefaultTemplates.sampleBody
@@ -102,7 +103,7 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	init() {}
 
 	private enum CodingKeys: String, CodingKey {
-		case settings, fonts, pageNumbers, footnotes, crossReferences, spreadTemplate, tocTemplate, bodyText
+		case settings, fonts, pageNumbers, footnotes, crossReferences, tocBuilder, spreadTemplate, tocTemplate, bodyText
 	}
 
 	init(from decoder: Decoder) throws {
@@ -113,6 +114,7 @@ struct BookDocument: FileDocument, Codable, Equatable {
 		pageNumbers = try container.decodeIfPresent(PageNumberSettings.self, forKey: .pageNumbers) ?? PageNumberSettings()
 		footnotes = try container.decodeIfPresent(FootnoteSettings.self, forKey: .footnotes) ?? FootnoteSettings()
 		crossReferences = try container.decodeIfPresent(CrossReferenceSettings.self, forKey: .crossReferences) ?? CrossReferenceSettings()
+		tocBuilder = try container.decodeIfPresent(TOCSettings.self, forKey: .tocBuilder) ?? TOCSettings()
 		spreadTemplate = try container.decode(String.self, forKey: .spreadTemplate)
 		tocTemplate = try container.decode(String.self, forKey: .tocTemplate)
 		bodyText = try container.decode(String.self, forKey: .bodyText)

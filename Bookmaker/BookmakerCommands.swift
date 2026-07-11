@@ -40,6 +40,10 @@ struct ShowCrossReferenceSettingsKey: FocusedValueKey {
 	typealias Value = Binding<Bool>
 }
 
+struct ShowTOCBuilderKey: FocusedValueKey {
+	typealias Value = Binding<Bool>
+}
+
 extension FocusedValues {
 	var typesetAction: TypesetActionKey.Value? {
 		get { self[TypesetActionKey.self] }
@@ -90,6 +94,11 @@ extension FocusedValues {
 		get { self[ShowCrossReferenceSettingsKey.self] }
 		set { self[ShowCrossReferenceSettingsKey.self] = newValue }
 	}
+
+	var showTOCBuilder: ShowTOCBuilderKey.Value? {
+		get { self[ShowTOCBuilderKey.self] }
+		set { self[ShowTOCBuilderKey.self] = newValue }
+	}
 }
 
 /// Menu equivalents of the toolbar controls. Disabled when no book window has focus.
@@ -104,6 +113,7 @@ struct BookmakerCommands: Commands {
 	@FocusedValue(\.insertReferenceMarkAction) private var insertReferenceMarkAction
 	@FocusedValue(\.showCrossReferenceInsert) private var showCrossReferenceInsert
 	@FocusedValue(\.showCrossReferenceSettings) private var showCrossReferenceSettings
+	@FocusedValue(\.showTOCBuilder) private var showTOCBuilder
 
 	var body: some Commands {
 		CommandGroup(after: .sidebar) {
@@ -136,6 +146,12 @@ struct BookmakerCommands: Commands {
 			}
 			.keyboardShortcut("r", modifiers: [.command, .option, .shift])
 			.disabled(showCrossReferenceSettings == nil)
+
+			Button("Table of Contents…") {
+				showTOCBuilder?.wrappedValue = true
+			}
+			.keyboardShortcut("t", modifiers: [.command, .option])
+			.disabled(showTOCBuilder == nil)
 
 			Divider()
 		}
