@@ -25,15 +25,19 @@ enum DefaultTemplates {
 	/// Wrapper for the whole book: document class, page geometry, running headers.
 	/// Placeholders: {{GEOMETRY}} (from page settings), {{FONTENCODING}} (fontenc or
 	/// fontspec, decided document-wide), {{FONTS}} (from font settings), {{PAGENUMBERS}}
-	/// (from page number settings), {{TOC}} (TOC template), {{BODY}} (body text).
+	/// (from page number settings), {{FOOTNOTES}} (from footnote settings),
+	/// {{CROSSREFERENCES}} (from cross-reference settings, only when the body
+	/// actually uses one), {{TOC}} (TOC template), {{BODY}} (body text).
 	static let spread = #"""
 	\documentclass[11pt,twoside,openright]{book}
 	{{FONTENCODING}}
 	\usepackage[{{GEOMETRY}}]{geometry}
 	{{FONTS}}
+	{{FOOTNOTES}}
+	{{CROSSREFERENCES}}
 	% running heads with page numbers, built into the book class;
-	% needs no packages, so it works with the bundled TinyTeX unless you use
-	% a system font or custom page numbers, which need a full TeX install
+	% needs no packages, so it works with the bundled TinyTeX unless you
+	% choose a system or variable font, which needs a full TeX install
 	% (e.g. MacTeX) with xelatex or lualatex.
 	\pagestyle{headings}
 	{{PAGENUMBERS}}
@@ -89,6 +93,8 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	var settings = PageSettings()
 	var fonts = FontSettings()
 	var pageNumbers = PageNumberSettings()
+	var footnotes = FootnoteSettings()
+	var crossReferences = CrossReferenceSettings()
 	var spreadTemplate = DefaultTemplates.spread
 	var tocTemplate = DefaultTemplates.toc
 	var bodyText = DefaultTemplates.sampleBody
@@ -96,7 +102,7 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	init() {}
 
 	private enum CodingKeys: String, CodingKey {
-		case settings, fonts, pageNumbers, spreadTemplate, tocTemplate, bodyText
+		case settings, fonts, pageNumbers, footnotes, crossReferences, spreadTemplate, tocTemplate, bodyText
 	}
 
 	init(from decoder: Decoder) throws {
@@ -105,6 +111,8 @@ struct BookDocument: FileDocument, Codable, Equatable {
 		// documents saved before these settings existed simply have no such key
 		fonts = try container.decodeIfPresent(FontSettings.self, forKey: .fonts) ?? FontSettings()
 		pageNumbers = try container.decodeIfPresent(PageNumberSettings.self, forKey: .pageNumbers) ?? PageNumberSettings()
+		footnotes = try container.decodeIfPresent(FootnoteSettings.self, forKey: .footnotes) ?? FootnoteSettings()
+		crossReferences = try container.decodeIfPresent(CrossReferenceSettings.self, forKey: .crossReferences) ?? CrossReferenceSettings()
 		spreadTemplate = try container.decode(String.self, forKey: .spreadTemplate)
 		tocTemplate = try container.decode(String.self, forKey: .tocTemplate)
 		bodyText = try container.decode(String.self, forKey: .bodyText)
@@ -123,15 +131,22 @@ struct BookDocument: FileDocument, Codable, Equatable {
 		return FileWrapper(regularFileWithContents: try encoder.encode(self))
 	}
 
-	/// True when any chosen font (body/heading/caption or the page number
-	/// font) is a system font rather than a curated pdflatex-safe one,
-	/// which pdflatex cannot render — compilation must switch to XeLaTeX.
+	/// True when any chosen font (body/heading/caption, the page number
+	/// font, or the footnote font) is a system font rather than a curated
+	/// pdflatex-safe one, which pdflatex cannot render — compilation must
+	/// switch to XeLaTeX.
 	var requiresXeLaTeX: Bool {
-		fonts.usesSystemFont || pageNumbers.usesSystemFont
+		fonts.usesSystemFont || pageNumbers.usesSystemFont || footnotes.usesSystemFont
+	}
+
+	/// True when the body text actually uses a varioref command, so the
+	/// package is only loaded once a cross-reference has actually been inserted.
+	private var usesCrossReferences: Bool {
+		bodyText.contains(#"\vpageref"#) || bodyText.contains(#"\vref"#)
 	}
 
 	/// The complete LaTeX source: spread template with TOC, body, geometry,
-	/// fonts and page numbers filled in.
+	/// fonts, page numbers, footnotes and cross-references filled in.
 	var assembledLaTeX: String {
 		let fontEncoding = requiresXeLaTeX ? #"\usepackage{fontspec}"# : #"\usepackage[T1]{fontenc}"#
 		return spreadTemplate
@@ -140,6 +155,8 @@ struct BookDocument: FileDocument, Codable, Equatable {
 			.replacingOccurrences(of: "{{GEOMETRY}}", with: settings.geometryOptions + pageNumbers.geometryExtras)
 			.replacingOccurrences(of: "{{FONTENCODING}}", with: fontEncoding)
 			.replacingOccurrences(of: "{{FONTS}}", with: fonts.preamble)
+			.replacingOccurrences(of: "{{FOOTNOTES}}", with: footnotes.preamble)
+			.replacingOccurrences(of: "{{CROSSREFERENCES}}", with: usesCrossReferences ? crossReferences.preamble : "")
 			.replacingOccurrences(of: "{{PAGENUMBERS}}", with: pageNumbers.preamble)
 	}
 }

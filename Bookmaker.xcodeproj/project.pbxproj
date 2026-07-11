@@ -27,6 +27,11 @@
 		AB0000010000000000000120 /* SystemFontPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000020 /* SystemFontPickerView.swift */; };
 		AB0000010000000000000121 /* PageNumberSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000021 /* PageNumberSettings.swift */; };
 		AB0000010000000000000122 /* PageNumberSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000022 /* PageNumberSettingsView.swift */; };
+		AB0000010000000000000123 /* FootnoteSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000023 /* FootnoteSettings.swift */; };
+		AB0000010000000000000124 /* FootnoteSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000024 /* FootnoteSettingsView.swift */; };
+		AB0000010000000000000125 /* CrossReferenceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000025 /* CrossReferenceSettings.swift */; };
+		AB0000010000000000000126 /* CrossReferenceSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000026 /* CrossReferenceSettingsView.swift */; };
+		AB0000010000000000000127 /* CrossReferenceInsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000027 /* CrossReferenceInsertView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +56,11 @@
 		AB0000010000000000000020 /* SystemFontPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFontPickerView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000021 /* PageNumberSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNumberSettings.swift; sourceTree = "<group>"; };
 		AB0000010000000000000022 /* PageNumberSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNumberSettingsView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000023 /* FootnoteSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FootnoteSettings.swift; sourceTree = "<group>"; };
+		AB0000010000000000000024 /* FootnoteSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FootnoteSettingsView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000025 /* CrossReferenceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceSettings.swift; sourceTree = "<group>"; };
+		AB0000010000000000000026 /* CrossReferenceSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceSettingsView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000027 /* CrossReferenceInsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceInsertView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -96,6 +106,11 @@
 				AB0000010000000000000020 /* SystemFontPickerView.swift */,
 				AB0000010000000000000021 /* PageNumberSettings.swift */,
 				AB0000010000000000000022 /* PageNumberSettingsView.swift */,
+				AB0000010000000000000023 /* FootnoteSettings.swift */,
+				AB0000010000000000000024 /* FootnoteSettingsView.swift */,
+				AB0000010000000000000025 /* CrossReferenceSettings.swift */,
+				AB0000010000000000000026 /* CrossReferenceSettingsView.swift */,
+				AB0000010000000000000027 /* CrossReferenceInsertView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -197,6 +212,11 @@
 				AB0000010000000000000120 /* SystemFontPickerView.swift in Sources */,
 				AB0000010000000000000121 /* PageNumberSettings.swift in Sources */,
 				AB0000010000000000000122 /* PageNumberSettingsView.swift in Sources */,
+				AB0000010000000000000123 /* FootnoteSettings.swift in Sources */,
+				AB0000010000000000000124 /* FootnoteSettingsView.swift in Sources */,
+				AB0000010000000000000125 /* CrossReferenceSettings.swift in Sources */,
+				AB0000010000000000000126 /* CrossReferenceSettingsView.swift in Sources */,
+				AB0000010000000000000127 /* CrossReferenceInsertView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

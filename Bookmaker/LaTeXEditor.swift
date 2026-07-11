@@ -1,6 +1,14 @@
 import SwiftUI
 import AppKit
 
+/// A snippet to insert at the cursor (e.g. from "Insert Footnote"), with the
+/// caret position it should land at afterwards, measured from the snippet's start.
+struct EditorSnippet: Equatable {
+	var id = UUID()
+	var text: String
+	var caretOffset: Int
+}
+
 /// Plain-text LaTeX editor: an NSTextView with all smart substitutions off
 /// (smart quotes would corrupt LaTeX source) and two kinds of autocompletion.
 /// Typing a backslash opens a popup of LaTeX commands automatically, narrowing
@@ -9,6 +17,7 @@ import AppKit
 /// so recurring names and terms complete without a fixed dictionary.
 struct LaTeXEditor: NSViewRepresentable {
 	@Binding var text: String
+	var pendingSnippet: Binding<EditorSnippet?> = .constant(nil)
 
 	func makeCoordinator() -> Coordinator {
 		Coordinator(self)
@@ -51,10 +60,18 @@ struct LaTeXEditor: NSViewRepresentable {
 			textView.string = text
 			textView.undoManager?.removeAllActions()
 		}
+		if let snippet = pendingSnippet.wrappedValue, context.coordinator.lastAppliedSnippetID != snippet.id {
+			context.coordinator.lastAppliedSnippetID = snippet.id
+			textView.insertSnippet(snippet)
+			DispatchQueue.main.async {
+				pendingSnippet.wrappedValue = nil
+			}
+		}
 	}
 
 	final class Coordinator: NSObject, NSTextViewDelegate {
 		var parent: LaTeXEditor
+		var lastAppliedSnippetID: UUID?
 
 		init(_ parent: LaTeXEditor) {
 			self.parent = parent
@@ -145,5 +162,23 @@ final class LaTeXTextView: NSTextView {
 		isCompleting = true
 		super.insertCompletion(word, forPartialWordRange: charRange, movement: movement, isFinal: flag)
 		isCompleting = false
+	}
+
+	/// Replaces the current selection with `snippet.text` (undo-aware, via the
+	/// normal shouldChangeText/didChangeText path so the delegate's
+	/// textDidChange still fires), then places the caret at its caretOffset.
+	func insertSnippet(_ snippet: EditorSnippet) {
+		guard window != nil else {
+			return
+		}
+		let range = selectedRange()
+		guard shouldChangeText(in: range, replacementString: snippet.text) else {
+			return
+		}
+		textStorage?.replaceCharacters(in: range, with: snippet.text)
+		didChangeText()
+		let caretLocation = range.location + snippet.caretOffset
+		setSelectedRange(NSRange(location: caretLocation, length: 0))
+		window?.makeFirstResponder(self)
 	}
 }

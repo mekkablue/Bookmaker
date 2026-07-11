@@ -11,9 +11,14 @@ struct GUICanvasView: View {
 	@Binding var settings: PageSettings
 	@Binding var bodyText: String
 	@Binding var pageNumbers: PageNumberSettings
+	let crossReferences: CrossReferenceSettings
 
 	private enum MarginKind: Equatable {
 		case top, bottom, inner, outer
+	}
+
+	private enum InsertionKind: Equatable {
+		case text, footnote
 	}
 
 	private static let pointsPerMM: CGFloat = 72.0 / 25.4
@@ -23,6 +28,7 @@ struct GUICanvasView: View {
 	@GestureState private var magnifyBy: CGFloat = 1.0
 
 	@State private var isInsertingText = false
+	@State private var insertionKind: InsertionKind = .text
 	@State private var pendingInsertionPoint: CGPoint?
 	@State private var pendingInsertionText = ""
 
@@ -31,6 +37,7 @@ struct GUICanvasView: View {
 	@State private var dragStartValue: Double = 0
 
 	@State private var showPageNumberSettings = false
+	@State private var showCrossReferenceInsert = false
 
 	var body: some View {
 		VStack(spacing: 0) {
@@ -72,11 +79,49 @@ struct GUICanvasView: View {
 
 			Divider().frame(height: 16)
 
-			Toggle(isOn: $isInsertingText) {
+			Toggle(isOn: Binding(
+				get: { isInsertingText && insertionKind == .text },
+				set: { active in
+					isInsertingText = active
+					if active { insertionKind = .text }
+				}
+			)) {
 				Label("Insert Text", systemImage: "text.insert")
 			}
 			.toggleStyle(.button)
 			.help("Click the page to insert a new paragraph of text")
+
+			Toggle(isOn: Binding(
+				get: { isInsertingText && insertionKind == .footnote },
+				set: { active in
+					isInsertingText = active
+					if active { insertionKind = .footnote }
+				}
+			)) {
+				Label("Insert Footnote", systemImage: "textformat.subscript")
+			}
+			.toggleStyle(.button)
+			.help("Click the page to insert a footnote")
+
+			Button {
+				let name = LabelScanner.nextMarkName(in: bodyText)
+				appendToBody("\\label{\(name)}")
+			} label: {
+				Label("Insert Reference Mark", systemImage: "mappin")
+			}
+			.help("Add a mark elsewhere in the text can point to")
+
+			Button {
+				showCrossReferenceInsert = true
+			} label: {
+				Label("Insert Cross-Reference", systemImage: "arrow.turn.up.right")
+			}
+			.help("Insert a \u{201c}see above/below/on page N\u{201d} reference to a mark")
+			.popover(isPresented: $showCrossReferenceInsert) {
+				CrossReferenceInsertView(bodyText: bodyText, introWord: crossReferences.introWord) { label in
+					appendToBody(crossReferences.referenceSnippet(to: label))
+				}
+			}
 
 			Divider().frame(height: 16)
 
@@ -162,7 +207,7 @@ struct GUICanvasView: View {
 
 	private var insertionPopover: some View {
 		VStack(alignment: .leading, spacing: 6) {
-			TextField("New paragraph…", text: $pendingInsertionText, onCommit: commitInsertion)
+			TextField(insertionKind == .footnote ? "Footnote text…" : "New paragraph…", text: $pendingInsertionText, onCommit: commitInsertion)
 				.textFieldStyle(.roundedBorder)
 				.frame(width: 180)
 			HStack {
@@ -191,10 +236,18 @@ struct GUICanvasView: View {
 			pendingInsertionPoint = nil
 			return
 		}
-		let separator = bodyText.isEmpty || bodyText.hasSuffix("\n\n") ? "" : "\n\n"
-		bodyText += separator + pendingInsertionText
+		let content = insertionKind == .footnote ? "\\footnote{\(pendingInsertionText)}" : pendingInsertionText
+		appendToBody(content)
 		pendingInsertionPoint = nil
 		pendingInsertionText = ""
+	}
+
+	/// bodyText has no live layout, so every canvas insertion tool appends
+	/// to the end rather than trying to map a click point to a position in
+	/// the LaTeX source.
+	private func appendToBody(_ text: String) {
+		let separator = bodyText.isEmpty || bodyText.hasSuffix("\n\n") ? "" : "\n\n"
+		bodyText += separator + text
 	}
 
 	// MARK: - Page numbers
