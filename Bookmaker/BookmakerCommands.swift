@@ -20,6 +20,26 @@ struct AutoTypesetKey: FocusedValueKey {
 	typealias Value = Binding<Bool>
 }
 
+struct InsertFootnoteActionKey: FocusedValueKey {
+	typealias Value = () -> Void
+}
+
+struct ShowFootnoteSettingsKey: FocusedValueKey {
+	typealias Value = Binding<Bool>
+}
+
+struct InsertReferenceMarkActionKey: FocusedValueKey {
+	typealias Value = () -> Void
+}
+
+struct ShowCrossReferenceInsertKey: FocusedValueKey {
+	typealias Value = Binding<Bool>
+}
+
+struct ShowCrossReferenceSettingsKey: FocusedValueKey {
+	typealias Value = Binding<Bool>
+}
+
 extension FocusedValues {
 	var typesetAction: TypesetActionKey.Value? {
 		get { self[TypesetActionKey.self] }
@@ -45,6 +65,31 @@ extension FocusedValues {
 		get { self[AutoTypesetKey.self] }
 		set { self[AutoTypesetKey.self] = newValue }
 	}
+
+	var insertFootnoteAction: InsertFootnoteActionKey.Value? {
+		get { self[InsertFootnoteActionKey.self] }
+		set { self[InsertFootnoteActionKey.self] = newValue }
+	}
+
+	var showFootnoteSettings: ShowFootnoteSettingsKey.Value? {
+		get { self[ShowFootnoteSettingsKey.self] }
+		set { self[ShowFootnoteSettingsKey.self] = newValue }
+	}
+
+	var insertReferenceMarkAction: InsertReferenceMarkActionKey.Value? {
+		get { self[InsertReferenceMarkActionKey.self] }
+		set { self[InsertReferenceMarkActionKey.self] = newValue }
+	}
+
+	var showCrossReferenceInsert: ShowCrossReferenceInsertKey.Value? {
+		get { self[ShowCrossReferenceInsertKey.self] }
+		set { self[ShowCrossReferenceInsertKey.self] = newValue }
+	}
+
+	var showCrossReferenceSettings: ShowCrossReferenceSettingsKey.Value? {
+		get { self[ShowCrossReferenceSettingsKey.self] }
+		set { self[ShowCrossReferenceSettingsKey.self] = newValue }
+	}
 }
 
 /// Menu equivalents of the toolbar controls. Disabled when no book window has focus.
@@ -54,6 +99,11 @@ struct BookmakerCommands: Commands {
 	@FocusedValue(\.showPageSetup) private var showPageSetup
 	@FocusedValue(\.showFontSettings) private var showFontSettings
 	@FocusedValue(\.autoTypeset) private var autoTypeset
+	@FocusedValue(\.insertFootnoteAction) private var insertFootnoteAction
+	@FocusedValue(\.showFootnoteSettings) private var showFootnoteSettings
+	@FocusedValue(\.insertReferenceMarkAction) private var insertReferenceMarkAction
+	@FocusedValue(\.showCrossReferenceInsert) private var showCrossReferenceInsert
+	@FocusedValue(\.showCrossReferenceSettings) private var showCrossReferenceSettings
 
 	var body: some Commands {
 		CommandGroup(after: .sidebar) {
@@ -75,6 +125,18 @@ struct BookmakerCommands: Commands {
 			.keyboardShortcut("f", modifiers: [.command, .option])
 			.disabled(showFontSettings == nil)
 
+			Button("Configure Footnotes…") {
+				showFootnoteSettings?.wrappedValue = true
+			}
+			.keyboardShortcut("n", modifiers: [.command, .option, .shift])
+			.disabled(showFootnoteSettings == nil)
+
+			Button("Configure Cross-References…") {
+				showCrossReferenceSettings?.wrappedValue = true
+			}
+			.keyboardShortcut("r", modifiers: [.command, .option, .shift])
+			.disabled(showCrossReferenceSettings == nil)
+
 			Divider()
 		}
 
@@ -87,6 +149,26 @@ struct BookmakerCommands: Commands {
 
 			Toggle("Auto Typeset", isOn: autoTypeset ?? .constant(false))
 				.disabled(autoTypeset == nil)
+		}
+
+		CommandMenu("Insert") {
+			Button("Insert Footnote") {
+				insertFootnoteAction?()
+			}
+			.keyboardShortcut("n", modifiers: [.command, .option])
+			.disabled(insertFootnoteAction == nil)
+
+			Button("Insert Reference Mark") {
+				insertReferenceMarkAction?()
+			}
+			.keyboardShortcut("l", modifiers: [.command, .option])
+			.disabled(insertReferenceMarkAction == nil)
+
+			Button("Insert Cross-Reference…") {
+				showCrossReferenceInsert?.wrappedValue = true
+			}
+			.keyboardShortcut("r", modifiers: [.command, .option])
+			.disabled(showCrossReferenceInsert == nil)
 		}
 	}
 }

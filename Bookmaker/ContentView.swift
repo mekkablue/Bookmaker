@@ -11,9 +11,13 @@ struct ContentView: View {
 	@State private var showPreview = true
 	@State private var showPageSetup = true
 	@State private var showFontSettings = false
+	@State private var showFootnoteSettings = false
+	@State private var showCrossReferenceSettings = false
+	@State private var showCrossReferenceInsert = false
 	@State private var autoTypeset = true
 	@State private var showLog = false
 	@State private var pendingTypeset: Task<Void, Never>?
+	@State private var pendingBodySnippet: EditorSnippet?
 
 	enum EditorMode: String, CaseIterable, Identifiable {
 		case text = "Text"
@@ -78,8 +82,25 @@ struct ContentView: View {
 		.focusedSceneValue(\.showPageSetup, $showPageSetup)
 		.focusedSceneValue(\.showFontSettings, $showFontSettings)
 		.focusedSceneValue(\.autoTypeset, $autoTypeset)
+		.focusedSceneValue(\.insertFootnoteAction, insertFootnote)
+		.focusedSceneValue(\.showFootnoteSettings, $showFootnoteSettings)
+		.focusedSceneValue(\.insertReferenceMarkAction, insertReferenceMark)
+		.focusedSceneValue(\.showCrossReferenceInsert, $showCrossReferenceInsert)
+		.focusedSceneValue(\.showCrossReferenceSettings, $showCrossReferenceSettings)
 		.sheet(isPresented: $showFontSettings) {
 			FontSettingsView(fonts: $document.fonts)
+		}
+		.sheet(isPresented: $showFootnoteSettings) {
+			FootnoteSettingsView(footnotes: $document.footnotes)
+		}
+		.sheet(isPresented: $showCrossReferenceSettings) {
+			CrossReferenceSettingsView(crossReferences: $document.crossReferences)
+		}
+		.sheet(isPresented: $showCrossReferenceInsert) {
+			CrossReferenceInsertView(bodyText: document.bodyText, introWord: document.crossReferences.introWord) { label in
+				let text = document.crossReferences.referenceSnippet(to: label)
+				insertIntoBody(EditorSnippet(text: text, caretOffset: text.count))
+			}
 		}
 		.onAppear {
 			typeset()
@@ -122,13 +143,18 @@ struct ContentView: View {
 			.padding(8)
 			Divider()
 			if editorMode == .text {
-				LaTeXEditor(text: sourceBinding)
+				LaTeXEditor(text: sourceBinding, pendingSnippet: editedSource == .bodyText ? $pendingBodySnippet : .constant(nil))
 				if showPageSetup {
 					Divider()
 					PageSetupView(settings: $document.settings)
 				}
 			} else {
-				GUICanvasView(settings: $document.settings, bodyText: $document.bodyText, pageNumbers: $document.pageNumbers)
+				GUICanvasView(
+					settings: $document.settings,
+					bodyText: $document.bodyText,
+					pageNumbers: $document.pageNumbers,
+					crossReferences: document.crossReferences
+				)
 			}
 		}
 	}
@@ -152,6 +178,33 @@ struct ContentView: View {
 			document.tocTemplate = DefaultTemplates.toc
 		case .bodyText:
 			break
+		}
+	}
+
+	// MARK: - Footnotes & cross-references
+
+	private func insertFootnote() {
+		let text = #"\footnote{}"#
+		insertIntoBody(EditorSnippet(text: text, caretOffset: text.count - 1))
+	}
+
+	private func insertReferenceMark() {
+		let name = LabelScanner.nextMarkName(in: document.bodyText)
+		let text = "\\label{\(name)}"
+		insertIntoBody(EditorSnippet(text: text, caretOffset: text.count))
+	}
+
+	/// Inserts at the cursor when the body editor is visible and focused;
+	/// otherwise brings it into view and appends, since there is no
+	/// meaningful cursor position to target.
+	private func insertIntoBody(_ snippet: EditorSnippet) {
+		if editorMode == .text, editedSource == .bodyText {
+			pendingBodySnippet = snippet
+		} else {
+			editorMode = .text
+			editedSource = .bodyText
+			let separator = document.bodyText.isEmpty || document.bodyText.hasSuffix("\n\n") ? "" : "\n\n"
+			document.bodyText += separator + snippet.text
 		}
 	}
 
@@ -209,7 +262,7 @@ struct ContentView: View {
 				.foregroundColor(.secondary)
 			Text("Needs a Full TeX Install")
 				.font(.headline)
-			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. The bundled TinyTeX only provides pdflatex — install a full TeX distribution such as MacTeX, or switch every font back to a built-in one in Edit Fonts and Page Numbers.")
+			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. The bundled TinyTeX only provides pdflatex — install a full TeX distribution such as MacTeX, or switch every font back to a built-in one in Edit Fonts, Page Numbers, and Configure Footnotes.")
 				.font(.caption)
 				.foregroundColor(.secondary)
 				.multilineTextAlignment(.center)
