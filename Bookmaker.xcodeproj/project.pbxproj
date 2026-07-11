@@ -22,6 +22,11 @@
 		AB0000010000000000000115 /* FontSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000015 /* FontSettings.swift */; };
 		AB0000010000000000000116 /* FontSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000016 /* FontSettingsView.swift */; };
 		AB0000010000000000000117 /* GUICanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000017 /* GUICanvasView.swift */; };
+		AB0000010000000000000118 /* OpenTypeFontTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000018 /* OpenTypeFontTables.swift */; };
+		AB0000010000000000000119 /* VariableFontAxesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000019 /* VariableFontAxesView.swift */; };
+		AB0000010000000000000120 /* SystemFontPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000020 /* SystemFontPickerView.swift */; };
+		AB0000010000000000000121 /* PageNumberSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000021 /* PageNumberSettings.swift */; };
+		AB0000010000000000000122 /* PageNumberSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000022 /* PageNumberSettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +46,11 @@
 		AB0000010000000000000015 /* FontSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettings.swift; sourceTree = "<group>"; };
 		AB0000010000000000000016 /* FontSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettingsView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000017 /* GUICanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUICanvasView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000018 /* OpenTypeFontTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenTypeFontTables.swift; sourceTree = "<group>"; };
+		AB0000010000000000000019 /* VariableFontAxesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableFontAxesView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000020 /* SystemFontPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFontPickerView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000021 /* PageNumberSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNumberSettings.swift; sourceTree = "<group>"; };
+		AB0000010000000000000022 /* PageNumberSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageNumberSettingsView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -81,6 +91,11 @@
 				AB0000010000000000000015 /* FontSettings.swift */,
 				AB0000010000000000000016 /* FontSettingsView.swift */,
 				AB0000010000000000000017 /* GUICanvasView.swift */,
+				AB0000010000000000000018 /* OpenTypeFontTables.swift */,
+				AB0000010000000000000019 /* VariableFontAxesView.swift */,
+				AB0000010000000000000020 /* SystemFontPickerView.swift */,
+				AB0000010000000000000021 /* PageNumberSettings.swift */,
+				AB0000010000000000000022 /* PageNumberSettingsView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -177,6 +192,11 @@
 				AB0000010000000000000115 /* FontSettings.swift in Sources */,
 				AB0000010000000000000116 /* FontSettingsView.swift in Sources */,
 				AB0000010000000000000117 /* GUICanvasView.swift in Sources */,
+				AB0000010000000000000118 /* OpenTypeFontTables.swift in Sources */,
+				AB0000010000000000000119 /* VariableFontAxesView.swift in Sources */,
+				AB0000010000000000000120 /* SystemFontPickerView.swift in Sources */,
+				AB0000010000000000000121 /* PageNumberSettings.swift in Sources */,
+				AB0000010000000000000122 /* PageNumberSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

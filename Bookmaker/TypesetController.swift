@@ -10,24 +10,24 @@ final class TypesetController: ObservableObject {
 	@Published var engineMissing = false
 
 	private let workDirectory: URL
-	private var queuedSource: String?
+	private var queuedSource: (source: String, engine: LaTeXEngineKind)?
 
 	init() {
 		workDirectory = FileManager.default.temporaryDirectory
 			.appendingPathComponent("Bookmaker-\(UUID().uuidString)", isDirectory: true)
 	}
 
-	func typeset(source: String) {
+	func typeset(source: String, engine: LaTeXEngineKind = .pdflatex) {
 		if isTypesetting {
 			// remember the newest source and run it as soon as the current pass finishes
-			queuedSource = source
+			queuedSource = (source, engine)
 			return
 		}
 		isTypesetting = true
 		lastError = nil
 		let directory = workDirectory
 		Task.detached(priority: .userInitiated) {
-			let result = LaTeXEngine.typeset(source: source, in: directory)
+			let result = LaTeXEngine.typeset(source: source, in: directory, engine: engine)
 			await MainActor.run {
 				self.finish(with: result)
 			}
@@ -44,7 +44,7 @@ final class TypesetController: ObservableObject {
 		}
 		if let queued = queuedSource {
 			queuedSource = nil
-			typeset(source: queued)
+			typeset(source: queued.source, engine: queued.engine)
 		}
 	}
 }

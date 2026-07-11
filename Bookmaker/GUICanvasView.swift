@@ -10,6 +10,7 @@ import AppKit
 struct GUICanvasView: View {
 	@Binding var settings: PageSettings
 	@Binding var bodyText: String
+	@Binding var pageNumbers: PageNumberSettings
 
 	private enum MarginKind: Equatable {
 		case top, bottom, inner, outer
@@ -28,6 +29,8 @@ struct GUICanvasView: View {
 	@State private var marginsUnlocked = false
 	@State private var activeDragMargin: MarginKind?
 	@State private var dragStartValue: Double = 0
+
+	@State private var showPageNumberSettings = false
 
 	var body: some View {
 		VStack(spacing: 0) {
@@ -84,6 +87,18 @@ struct GUICanvasView: View {
 			.tint(marginsUnlocked ? .orange : nil)
 			.help("Unlock to drag the margin guides; locked margins can't be moved by accident")
 
+			Divider().frame(height: 16)
+
+			Button {
+				showPageNumberSettings = true
+			} label: {
+				Label("Page Numbers", systemImage: "number")
+			}
+			.help("Show and position page numbers")
+			.popover(isPresented: $showPageNumberSettings) {
+				PageNumberSettingsView(pageNumbers: $pageNumbers)
+			}
+
 			Spacer()
 		}
 		.padding(8)
@@ -109,6 +124,10 @@ struct GUICanvasView: View {
 				.shadow(radius: 3)
 
 			marginOverlay(pageSize: size)
+
+			if pageNumbers.isEnabled {
+				pageNumberMarker(pageSize: size)
+			}
 
 			if isInsertingText {
 				Color.black.opacity(0.001)
@@ -176,6 +195,38 @@ struct GUICanvasView: View {
 		bodyText += separator + pendingInsertionText
 		pendingInsertionPoint = nil
 		pendingInsertionText = ""
+	}
+
+	// MARK: - Page numbers
+
+	/// Positioned relative to the margin lines already drawn, so the number
+	/// visibly stays pinned to whichever margin it's aligned with.
+	private func pageNumberMarker(pageSize: CGSize) -> some View {
+		let top = settings.marginTop * Self.pointsPerMM
+		let bottom = settings.marginBottom * Self.pointsPerMM
+		let inner = settings.marginInner * Self.pointsPerMM
+		let outer = settings.marginOuter * Self.pointsPerMM
+		let insetPoints = pageNumbers.marginInset * Self.pointsPerMM
+
+		let y: CGFloat
+		switch pageNumbers.vertical {
+		case .top: y = max(6, top - insetPoints)
+		case .bottom: y = min(pageSize.height - 6, pageSize.height - bottom + insetPoints)
+		}
+		let x: CGFloat
+		switch pageNumbers.horizontal {
+		case .inner: x = inner / 2
+		case .center: x = pageSize.width / 2
+		case .outer: x = pageSize.width - outer / 2
+		}
+
+		return Text("1")
+			.font(.system(size: 9, weight: .medium))
+			.foregroundColor(.secondary)
+			.padding(3)
+			.background(Color.accentColor.opacity(0.15))
+			.cornerRadius(3)
+			.position(x: x, y: y)
 	}
 
 	// MARK: - Margins

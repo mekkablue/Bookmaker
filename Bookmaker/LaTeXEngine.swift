@@ -7,12 +7,21 @@ struct TypesetResult {
 	var engineMissing = false
 }
 
+/// Which TeX binary compiles the document. pdflatex handles everything the
+/// app could produce until a document uses a system/variable font or custom
+/// page numbers, at which point it needs XeLaTeX's fontspec support instead.
+enum LaTeXEngineKind: String {
+	case pdflatex
+	case xelatex
+	case lualatex
+}
+
 enum LaTeXEngine {
-	static let engineCandidates = [
-		"/Library/TeX/texbin/pdflatex",
-		"/opt/homebrew/bin/pdflatex",
-		"/usr/local/bin/pdflatex",
-		"/usr/texbin/pdflatex",
+	private static let searchRoots = [
+		"/Library/TeX/texbin",
+		"/opt/homebrew/bin",
+		"/usr/local/bin",
+		"/usr/texbin",
 	]
 
 	/// Root folder for the app-managed TinyTeX installation (~/Library/Application Support/Bookmaker).
@@ -22,14 +31,15 @@ enum LaTeXEngine {
 		return appSupport.appendingPathComponent("Bookmaker", isDirectory: true)
 	}
 
-	/// pdflatex inside the app-managed TinyTeX, if installed (platform folder varies, e.g. universal-darwin).
-	static var managedEnginePath: String? {
+	/// The named engine inside the app-managed TinyTeX, if installed (platform folder varies, e.g. universal-darwin).
+	/// TinyTeX's smallest bundle only provides pdflatex, so this is usually nil for xelatex/lualatex.
+	static func managedEnginePath(_ kind: LaTeXEngineKind) -> String? {
 		let binRoot = managedInstallRoot.appendingPathComponent("TinyTeX/bin", isDirectory: true)
 		guard let platforms = try? FileManager.default.contentsOfDirectory(atPath: binRoot.path) else {
 			return nil
 		}
 		for platform in platforms {
-			let candidate = binRoot.appendingPathComponent(platform).appendingPathComponent("pdflatex").path
+			let candidate = binRoot.appendingPathComponent(platform).appendingPathComponent(kind.rawValue).path
 			if FileManager.default.isExecutableFile(atPath: candidate) {
 				return candidate
 			}
@@ -37,17 +47,20 @@ enum LaTeXEngine {
 		return nil
 	}
 
-	static func findEngine() -> String? {
-		for path in engineCandidates where FileManager.default.isExecutableFile(atPath: path) {
-			return path
+	static func findEngine(_ kind: LaTeXEngineKind) -> String? {
+		for root in searchRoots {
+			let path = "\(root)/\(kind.rawValue)"
+			if FileManager.default.isExecutableFile(atPath: path) {
+				return path
+			}
 		}
-		if let managed = managedEnginePath {
+		if let managed = managedEnginePath(kind) {
 			return managed
 		}
 		// last resort: the user's login shell may know a PATH that the app does not
 		let process = Process()
 		process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-		process.arguments = ["-l", "-c", "command -v pdflatex"]
+		process.arguments = ["-l", "-c", "command -v \(kind.rawValue)"]
 		let pipe = Pipe()
 		process.standardOutput = pipe
 		process.standardError = Pipe()
@@ -67,14 +80,13 @@ enum LaTeXEngine {
 		return nil
 	}
 
-	static func typeset(source: String, in directory: URL) -> TypesetResult {
-		guard let engine = findEngine() else {
-			return TypesetResult(
-				pdfData: nil,
-				log: "",
-				errorMessage: "No pdflatex found.",
-				engineMissing: true
-			)
+	static func typeset(source: String, in directory: URL, engine kind: LaTeXEngineKind = .pdflatex) -> TypesetResult {
+		guard let engine = findEngine(kind) else {
+			var message = "No \(kind.rawValue) found."
+			if kind != .pdflatex {
+				message += " This document uses a system or variable font, which needs a full TeX install (e.g. MacTeX) with \(kind.rawValue) — the bundled TinyTeX only provides pdflatex."
+			}
+			return TypesetResult(pdfData: nil, log: "", errorMessage: message, engineMissing: true)
 		}
 		let pdfURL = directory.appendingPathComponent("main.pdf")
 		do {
@@ -90,7 +102,7 @@ enum LaTeXEngine {
 					return TypesetResult(
 						pdfData: try? Data(contentsOf: pdfURL),
 						log: output,
-						errorMessage: firstErrorLine(in: output) ?? "pdflatex exited with status \(status)."
+						errorMessage: firstErrorLine(in: output) ?? "\(kind.rawValue) exited with status \(status)."
 					)
 				}
 			}

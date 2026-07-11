@@ -57,7 +57,7 @@ struct ContentView: View {
 				} label: {
 					Label("Typeset", systemImage: "play.fill")
 				}
-				.help("Typeset the book with pdflatex (⌘R)")
+				.help("Typeset the book (⌘R)")
 				.disabled(typesetter.isTypesetting)
 				Toggle(isOn: $autoTypeset) {
 					Label("Auto Typeset", systemImage: "arrow.triangle.2.circlepath")
@@ -128,7 +128,7 @@ struct ContentView: View {
 					PageSetupView(settings: $document.settings)
 				}
 			} else {
-				GUICanvasView(settings: $document.settings, bodyText: $document.bodyText)
+				GUICanvasView(settings: $document.settings, bodyText: $document.bodyText, pageNumbers: $document.pageNumbers)
 			}
 		}
 	}
@@ -177,7 +177,9 @@ struct ContentView: View {
 			}
 			.padding(8)
 			Divider()
-			if typesetter.engineMissing {
+			if typesetter.engineMissing, document.requiresXeLaTeX {
+				xelatexMissingView
+			} else if typesetter.engineMissing {
 				LaTeXInstallView(installer: installer) {
 					typeset()
 				}
@@ -198,6 +200,29 @@ struct ContentView: View {
 				errorBar(error)
 			}
 		}
+	}
+
+	private var xelatexMissingView: some View {
+		VStack(spacing: 12) {
+			Image(systemName: "textformat.characters")
+				.font(.system(size: 36))
+				.foregroundColor(.secondary)
+			Text("Needs a Full TeX Install")
+				.font(.headline)
+			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. The bundled TinyTeX only provides pdflatex — install a full TeX distribution such as MacTeX, or switch every font back to a built-in one in Edit Fonts and Page Numbers.")
+				.font(.caption)
+				.foregroundColor(.secondary)
+				.multilineTextAlignment(.center)
+				.frame(maxWidth: 340)
+			Link("Get MacTeX…", destination: URL(string: "https://tug.org/mactex/")!)
+				.font(.caption)
+			Button("Try Again") {
+				typeset()
+			}
+			.keyboardShortcut(.defaultAction)
+		}
+		.padding(20)
+		.frame(maxWidth: .infinity, maxHeight: .infinity)
 	}
 
 	private func errorBar(_ error: String) -> some View {
@@ -234,7 +259,8 @@ struct ContentView: View {
 
 	private func typeset() {
 		pendingTypeset?.cancel()
-		typesetter.typeset(source: document.assembledLaTeX)
+		let engine: LaTeXEngineKind = document.requiresXeLaTeX ? .xelatex : .pdflatex
+		typesetter.typeset(source: document.assembledLaTeX, engine: engine)
 	}
 
 	private func scheduleAutoTypeset() {

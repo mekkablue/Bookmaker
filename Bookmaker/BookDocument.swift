@@ -23,17 +23,20 @@ struct PageSettings: Codable, Equatable {
 
 enum DefaultTemplates {
 	/// Wrapper for the whole book: document class, page geometry, running headers.
-	/// Placeholders: {{GEOMETRY}} (from page settings), {{FONTS}} (from font settings),
-	/// {{TOC}} (TOC template), {{BODY}} (body text).
+	/// Placeholders: {{GEOMETRY}} (from page settings), {{FONTENCODING}} (fontenc or
+	/// fontspec, decided document-wide), {{FONTS}} (from font settings), {{PAGENUMBERS}}
+	/// (from page number settings), {{TOC}} (TOC template), {{BODY}} (body text).
 	static let spread = #"""
 	\documentclass[11pt,twoside,openright]{book}
-	\usepackage[T1]{fontenc}
+	{{FONTENCODING}}
 	\usepackage[{{GEOMETRY}}]{geometry}
 	{{FONTS}}
 	% running heads with page numbers, built into the book class;
-	% needs no packages, so it works with the bundled TinyTeX.
-	% With a full MacTeX you can switch to \usepackage{fancyhdr} here.
+	% needs no packages, so it works with the bundled TinyTeX unless you use
+	% a system font or custom page numbers, which need a full TeX install
+	% (e.g. MacTeX) with xelatex or lualatex.
 	\pagestyle{headings}
+	{{PAGENUMBERS}}
 
 	\begin{document}
 
@@ -85,6 +88,7 @@ struct BookDocument: FileDocument, Codable, Equatable {
 
 	var settings = PageSettings()
 	var fonts = FontSettings()
+	var pageNumbers = PageNumberSettings()
 	var spreadTemplate = DefaultTemplates.spread
 	var tocTemplate = DefaultTemplates.toc
 	var bodyText = DefaultTemplates.sampleBody
@@ -92,14 +96,15 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	init() {}
 
 	private enum CodingKeys: String, CodingKey {
-		case settings, fonts, spreadTemplate, tocTemplate, bodyText
+		case settings, fonts, pageNumbers, spreadTemplate, tocTemplate, bodyText
 	}
 
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		settings = try container.decode(PageSettings.self, forKey: .settings)
-		// documents saved before font settings existed simply have no "fonts" key
+		// documents saved before these settings existed simply have no such key
 		fonts = try container.decodeIfPresent(FontSettings.self, forKey: .fonts) ?? FontSettings()
+		pageNumbers = try container.decodeIfPresent(PageNumberSettings.self, forKey: .pageNumbers) ?? PageNumberSettings()
 		spreadTemplate = try container.decode(String.self, forKey: .spreadTemplate)
 		tocTemplate = try container.decode(String.self, forKey: .tocTemplate)
 		bodyText = try container.decode(String.self, forKey: .bodyText)
@@ -118,12 +123,23 @@ struct BookDocument: FileDocument, Codable, Equatable {
 		return FileWrapper(regularFileWithContents: try encoder.encode(self))
 	}
 
-	/// The complete LaTeX source: spread template with TOC, body and geometry filled in.
+	/// True when any chosen font (body/heading/caption or the page number
+	/// font) is a system font rather than a curated pdflatex-safe one,
+	/// which pdflatex cannot render — compilation must switch to XeLaTeX.
+	var requiresXeLaTeX: Bool {
+		fonts.usesSystemFont || pageNumbers.usesSystemFont
+	}
+
+	/// The complete LaTeX source: spread template with TOC, body, geometry,
+	/// fonts and page numbers filled in.
 	var assembledLaTeX: String {
-		spreadTemplate
+		let fontEncoding = requiresXeLaTeX ? #"\usepackage{fontspec}"# : #"\usepackage[T1]{fontenc}"#
+		return spreadTemplate
 			.replacingOccurrences(of: "{{TOC}}", with: tocTemplate)
 			.replacingOccurrences(of: "{{BODY}}", with: bodyText)
-			.replacingOccurrences(of: "{{GEOMETRY}}", with: settings.geometryOptions)
+			.replacingOccurrences(of: "{{GEOMETRY}}", with: settings.geometryOptions + pageNumbers.geometryExtras)
+			.replacingOccurrences(of: "{{FONTENCODING}}", with: fontEncoding)
 			.replacingOccurrences(of: "{{FONTS}}", with: fonts.preamble)
+			.replacingOccurrences(of: "{{PAGENUMBERS}}", with: pageNumbers.preamble)
 	}
 }
