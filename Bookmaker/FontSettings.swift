@@ -144,11 +144,13 @@ struct FontSettings: Codable, Equatable {
 	}
 
 	/// Documents saved before `FontSelection` existed stored a bare `FontChoice`.
+	/// (`try?` on an already-optional-returning call flattens to a single
+	/// optional, so one `if let` unwraps both the error and the "absent" case.)
 	private static func decodeSelection(_ container: KeyedDecodingContainer<CodingKeys>, _ key: CodingKeys) -> FontSelection? {
-		if let selection = try? container.decodeIfPresent(FontSelection.self, forKey: key), let selection = selection {
+		if let selection = try? container.decodeIfPresent(FontSelection.self, forKey: key) {
 			return selection
 		}
-		if let legacy = try? container.decodeIfPresent(FontChoice.self, forKey: key), let legacy = legacy {
+		if let legacy = try? container.decodeIfPresent(FontChoice.self, forKey: key) {
 			return .builtin(legacy)
 		}
 		return nil
