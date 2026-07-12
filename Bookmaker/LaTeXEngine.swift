@@ -31,20 +31,27 @@ enum LaTeXEngine {
 		return appSupport.appendingPathComponent("Bookmaker", isDirectory: true)
 	}
 
-	/// The named engine inside the app-managed TinyTeX, if installed (platform folder varies, e.g. universal-darwin).
-	/// TinyTeX's smallest bundle only provides pdflatex, so this is usually nil for xelatex/lualatex.
-	static func managedEnginePath(_ kind: LaTeXEngineKind) -> String? {
+	/// The named binary inside the app-managed TinyTeX, if installed (platform
+	/// folder varies, e.g. universal-darwin). Works for engines (pdflatex,
+	/// xelatex, ...) and TinyTeX's own tools (tlmgr).
+	static func managedToolPath(_ toolName: String) -> String? {
 		let binRoot = managedInstallRoot.appendingPathComponent("TinyTeX/bin", isDirectory: true)
 		guard let platforms = try? FileManager.default.contentsOfDirectory(atPath: binRoot.path) else {
 			return nil
 		}
 		for platform in platforms {
-			let candidate = binRoot.appendingPathComponent(platform).appendingPathComponent(kind.rawValue).path
+			let candidate = binRoot.appendingPathComponent(platform).appendingPathComponent(toolName).path
 			if FileManager.default.isExecutableFile(atPath: candidate) {
 				return candidate
 			}
 		}
 		return nil
+	}
+
+	/// TinyTeX's smallest bundle only provides pdflatex, so this is usually nil for xelatex/lualatex
+	/// until LaTeXInstaller.installXeLaTeXSupport() adds them via tlmgr.
+	static func managedEnginePath(_ kind: LaTeXEngineKind) -> String? {
+		managedToolPath(kind.rawValue)
 	}
 
 	static func findEngine(_ kind: LaTeXEngineKind) -> String? {
