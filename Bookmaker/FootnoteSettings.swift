@@ -18,31 +18,20 @@ enum FootnoteNumberingStyle: String, Codable, CaseIterable, Identifiable {
 	}
 }
 
-/// Footnote appearance. Left at the defaults, this generates no preamble
-/// changes: footnotes look exactly like the book class's own, and
-/// `\footnote[3]{...}`'s optional-number form keeps working, since the
-/// font override hooks `\@makefntext` rather than redefining `\footnote` itself.
+/// Footnote numbering. Font/size/color live in `TextStylesCatalog` (role
+/// `.footnote`) alongside every other text type, edited via "Edit Styles…".
+/// Left at the defaults, this generates no preamble changes: footnotes
+/// look exactly like the book class's own, and `\footnote[3]{...}`'s
+/// optional-number form keeps working, since the style hook wraps
+/// `\@makefntext` rather than redefining `\footnote` itself.
 struct FootnoteSettings: Codable, Equatable {
 	var numberingStyle: FootnoteNumberingStyle = .arabic
-	var font: FontSelection = .builtin(.computerModern)
 	/// Restart footnote numbering on every page rather than counting through the whole book.
 	var resetsPerPage = false
 
-	var usesSystemFont: Bool {
-		if case .system = font {
-			return true
-		}
-		return false
-	}
-
-	private var isDefaultFont: Bool {
-		if case .builtin(.computerModern) = font {
-			return true
-		}
-		return false
-	}
-
-	var preamble: String {
+	/// `styleIsCustomized` is `TextStylesCatalog`'s `.footnote` role's
+	/// `isCustomized`, passed in so this stays decoupled from the styles model.
+	func preamble(styleIsCustomized: Bool) -> String {
 		var lines: [String] = []
 		if resetsPerPage {
 			lines.append(#"\usepackage[perpage]{footmisc}"#)
@@ -50,12 +39,10 @@ struct FootnoteSettings: Codable, Equatable {
 		if numberingStyle != .arabic {
 			lines.append("\\renewcommand{\\thefootnote}{\(numberingStyle.counterCommand)}")
 		}
-		if !isDefaultFont {
-			var loadedPackages = Set<String>()
-			FontSettings.appendFontFamilyMacro("footnotefont", for: font, loadedPackages: &loadedPackages, lines: &lines)
+		if styleIsCustomized {
 			lines.append(#"\makeatletter"#)
 			lines.append(#"\let\bookmakerOldMakeFntext\@makefntext"#)
-			lines.append(#"\renewcommand{\@makefntext}[1]{\footnotefont\bookmakerOldMakeFntext{#1}}"#)
+			lines.append(#"\renewcommand{\@makefntext}[1]{\footnotestyle\bookmakerOldMakeFntext{#1}}"#)
 			lines.append(#"\makeatother"#)
 		}
 		return lines.joined(separator: "\n")

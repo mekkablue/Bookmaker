@@ -15,25 +15,15 @@ enum PageNumberHorizontalPosition: String, Codable, CaseIterable, Identifiable {
 
 /// Page numbers, positioned relative to the page margins so they're easy to
 /// keep aligned with the text block as margins change. Off by default, so
-/// an untouched document keeps the book class's own running heads.
+/// an untouched document keeps the book class's own running heads. Font/
+/// size/color live in `TextStylesCatalog` (role `.pageNumber`) alongside
+/// every other text type, edited via "Edit Styles…".
 struct PageNumberSettings: Codable, Equatable {
 	var isEnabled = false
-	var font: FontSelection = .builtin(.computerModern)
-	var fontSize: Double = 10
 	var vertical: PageNumberVerticalPosition = .bottom
 	var horizontal: PageNumberHorizontalPosition = .outer
 	/// Distance, in mm, from the page-number baseline to the margin line it's pinned to.
 	var marginInset: Double = 8
-
-	var usesSystemFont: Bool {
-		guard isEnabled else {
-			return false
-		}
-		if case .system = font {
-			return true
-		}
-		return false
-	}
 
 	/// Extra `geometry` package options that reserve space for the number
 	/// at `marginInset` beyond the page margin.
@@ -49,7 +39,8 @@ struct PageNumberSettings: Codable, Equatable {
 		}
 	}
 
-	/// LaTeX preamble lines that place the page number using fancyhdr; empty when disabled.
+	/// LaTeX preamble lines that place the page number using fancyhdr
+	/// (referencing `\pagenumberstyle`, always defined by `TextStylesCatalog`); empty when disabled.
 	var preamble: String {
 		guard isEnabled else {
 			return ""
@@ -61,12 +52,7 @@ struct PageNumberSettings: Codable, Equatable {
 		lines.append(#"\renewcommand{\headrulewidth}{0pt}"#)
 		lines.append(#"\renewcommand{\footrulewidth}{0pt}"#)
 
-		var loadedPackages = Set<String>()
-		FontSettings.appendFontFamilyMacro("pagenumberfont", for: font, loadedPackages: &loadedPackages, lines: &lines)
-
-		let sizePt = max(6, Int(fontSize.rounded()))
-		let baselineSkip = max(sizePt, Int((fontSize * 1.2).rounded()))
-		let numberText = #"\fontsize{\#(sizePt)}{\#(baselineSkip)}\selectfont\pagenumberfont\thepage"#
+		let numberText = #"\pagenumberstyle\thepage"#
 
 		let positionSpec: String
 		switch horizontal {

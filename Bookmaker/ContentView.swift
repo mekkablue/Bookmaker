@@ -10,7 +10,7 @@ struct ContentView: View {
 	@State private var previewMode: PreviewMode = .spreads
 	@State private var showPreview = true
 	@State private var showPageSetup = true
-	@State private var showFontSettings = false
+	@State private var showEditStyles = false
 	@State private var showFootnoteSettings = false
 	@State private var showCrossReferenceSettings = false
 	@State private var showCrossReferenceInsert = false
@@ -81,7 +81,7 @@ struct ContentView: View {
 		.focusedSceneValue(\.typesetAction, typeset)
 		.focusedSceneValue(\.showPreview, $showPreview)
 		.focusedSceneValue(\.showPageSetup, $showPageSetup)
-		.focusedSceneValue(\.showFontSettings, $showFontSettings)
+		.focusedSceneValue(\.showEditStyles, $showEditStyles)
 		.focusedSceneValue(\.autoTypeset, $autoTypeset)
 		.focusedSceneValue(\.insertFootnoteAction, insertFootnote)
 		.focusedSceneValue(\.showFootnoteSettings, $showFootnoteSettings)
@@ -89,8 +89,8 @@ struct ContentView: View {
 		.focusedSceneValue(\.showCrossReferenceInsert, $showCrossReferenceInsert)
 		.focusedSceneValue(\.showCrossReferenceSettings, $showCrossReferenceSettings)
 		.focusedSceneValue(\.showTOCBuilder, $showTOCBuilder)
-		.sheet(isPresented: $showFontSettings) {
-			FontSettingsView(fonts: $document.fonts)
+		.sheet(isPresented: $showEditStyles) {
+			EditStylesView(textStyles: $document.textStyles)
 		}
 		.sheet(isPresented: $showFootnoteSettings) {
 			FootnoteSettingsView(footnotes: $document.footnotes)
@@ -297,7 +297,7 @@ struct ContentView: View {
 				.foregroundColor(.secondary)
 			Text("Needs XeLaTeX")
 				.font(.headline)
-			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. Add that to your TinyTeX install, or switch every font back to a built-in one in Edit Fonts, Page Numbers, and Configure Footnotes.")
+			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. Add that to your TinyTeX install, or switch every font back to a built-in one in Edit ▸ Edit Styles….")
 				.font(.caption)
 				.foregroundColor(.secondary)
 				.multilineTextAlignment(.center)

@@ -1,11 +1,10 @@
 import SwiftUI
 
-/// Page number controls for the GUI canvas: enable/disable, font, size, and
-/// a position grid defined in terms of the page margins, so numbers stay
-/// aligned as margins change.
+/// Page number controls for the GUI canvas: enable/disable and a position
+/// grid defined in terms of the page margins, so numbers stay aligned as
+/// margins change. Font, size, and color are set in "Edit Styles…".
 struct PageNumberSettingsView: View {
 	@Binding var pageNumbers: PageNumberSettings
-	@State private var showingFontPicker = false
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
@@ -33,72 +32,13 @@ struct PageNumberSettingsView: View {
 						.foregroundColor(.secondary)
 				}
 
-				HStack {
-					Text("Font")
-						.frame(width: 130, alignment: .leading)
-					fontLabel
-					Button("Choose…") {
-						showingFontPicker = true
-					}
-					.controlSize(.small)
-				}
-
-				HStack {
-					Text("Size")
-						.frame(width: 130, alignment: .leading)
-					TextField("", value: $pageNumbers.fontSize, format: .number)
-						.textFieldStyle(.roundedBorder)
-						.frame(width: 52)
-					Text("pt")
-						.font(.caption)
-						.foregroundColor(.secondary)
-				}
-
-				if pageNumbers.usesSystemFont {
-					Text("Needs a full TeX install (e.g. MacTeX) with xelatex.")
-						.font(.caption)
-						.foregroundColor(.secondary)
-				}
+				Text("Font, size, and color are set in Edit ▸ Edit Styles…")
+					.font(.caption)
+					.foregroundColor(.secondary)
 			}
 		}
 		.padding(16)
 		.frame(width: 320)
-		.sheet(isPresented: $showingFontPicker) {
-			SystemFontPickerView { chosen in
-				pageNumbers.font = .system(chosen)
-			}
-		}
-	}
-
-	private var fontLabel: some View {
-		Group {
-			switch pageNumbers.font {
-			case .builtin:
-				Picker("", selection: builtinBinding) {
-					ForEach(FontChoice.allCases) { choice in
-						Text(choice.rawValue).tag(choice)
-					}
-				}
-				.labelsHidden()
-				.frame(width: 130)
-			case .system(let system):
-				Text(system.displayName)
-					.lineLimit(1)
-					.frame(width: 130, alignment: .leading)
-			}
-		}
-	}
-
-	private var builtinBinding: Binding<FontChoice> {
-		Binding(
-			get: {
-				if case .builtin(let choice) = pageNumbers.font {
-					return choice
-				}
-				return .computerModern
-			},
-			set: { pageNumbers.font = .builtin($0) }
-		)
 	}
 
 	private var positionGrid: some View {

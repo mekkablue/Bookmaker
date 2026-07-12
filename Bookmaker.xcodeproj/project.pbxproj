@@ -20,7 +20,6 @@
 		AB0000010000000000000113 /* LaTeXInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000013 /* LaTeXInstaller.swift */; };
 		AB0000010000000000000114 /* LaTeXInstallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000014 /* LaTeXInstallView.swift */; };
 		AB0000010000000000000115 /* FontSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000015 /* FontSettings.swift */; };
-		AB0000010000000000000116 /* FontSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000016 /* FontSettingsView.swift */; };
 		AB0000010000000000000117 /* GUICanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000017 /* GUICanvasView.swift */; };
 		AB0000010000000000000118 /* OpenTypeFontTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000018 /* OpenTypeFontTables.swift */; };
 		AB0000010000000000000119 /* VariableFontAxesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000019 /* VariableFontAxesView.swift */; };
@@ -35,6 +34,8 @@
 		AB0000010000000000000128 /* TOCSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000028 /* TOCSettings.swift */; };
 		AB0000010000000000000129 /* TOCBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000029 /* TOCBuilderView.swift */; };
 		AB0000010000000000000130 /* CanvasScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000030 /* CanvasScrollView.swift */; };
+		AB0000010000000000000131 /* TextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000031 /* TextStyle.swift */; };
+		AB0000010000000000000132 /* EditStylesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000032 /* EditStylesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,7 +53,6 @@
 		AB0000010000000000000013 /* LaTeXInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXInstaller.swift; sourceTree = "<group>"; };
 		AB0000010000000000000014 /* LaTeXInstallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaTeXInstallView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000015 /* FontSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettings.swift; sourceTree = "<group>"; };
-		AB0000010000000000000016 /* FontSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSettingsView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000017 /* GUICanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GUICanvasView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000018 /* OpenTypeFontTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenTypeFontTables.swift; sourceTree = "<group>"; };
 		AB0000010000000000000019 /* VariableFontAxesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VariableFontAxesView.swift; sourceTree = "<group>"; };
@@ -67,6 +67,8 @@
 		AB0000010000000000000028 /* TOCSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCSettings.swift; sourceTree = "<group>"; };
 		AB0000010000000000000029 /* TOCBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCBuilderView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000030 /* CanvasScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasScrollView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000031 /* TextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextStyle.swift; sourceTree = "<group>"; };
+		AB0000010000000000000032 /* EditStylesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditStylesView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -105,7 +107,6 @@
 				AB0000010000000000000013 /* LaTeXInstaller.swift */,
 				AB0000010000000000000014 /* LaTeXInstallView.swift */,
 				AB0000010000000000000015 /* FontSettings.swift */,
-				AB0000010000000000000016 /* FontSettingsView.swift */,
 				AB0000010000000000000017 /* GUICanvasView.swift */,
 				AB0000010000000000000018 /* OpenTypeFontTables.swift */,
 				AB0000010000000000000019 /* VariableFontAxesView.swift */,
@@ -120,6 +121,8 @@
 				AB0000010000000000000028 /* TOCSettings.swift */,
 				AB0000010000000000000029 /* TOCBuilderView.swift */,
 				AB0000010000000000000030 /* CanvasScrollView.swift */,
+				AB0000010000000000000031 /* TextStyle.swift */,
+				AB0000010000000000000032 /* EditStylesView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -214,7 +217,6 @@
 				AB0000010000000000000113 /* LaTeXInstaller.swift in Sources */,
 				AB0000010000000000000114 /* LaTeXInstallView.swift in Sources */,
 				AB0000010000000000000115 /* FontSettings.swift in Sources */,
-				AB0000010000000000000116 /* FontSettingsView.swift in Sources */,
 				AB0000010000000000000117 /* GUICanvasView.swift in Sources */,
 				AB0000010000000000000118 /* OpenTypeFontTables.swift in Sources */,
 				AB0000010000000000000119 /* VariableFontAxesView.swift in Sources */,
@@ -229,6 +231,8 @@
 				AB0000010000000000000128 /* TOCSettings.swift in Sources */,
 				AB0000010000000000000129 /* TOCBuilderView.swift in Sources */,
 				AB0000010000000000000130 /* CanvasScrollView.swift in Sources */,
+				AB0000010000000000000131 /* TextStyle.swift in Sources */,
+				AB0000010000000000000132 /* EditStylesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
