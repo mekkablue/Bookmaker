@@ -295,19 +295,32 @@ struct ContentView: View {
 			Image(systemName: "textformat.characters")
 				.font(.system(size: 36))
 				.foregroundColor(.secondary)
-			Text("Needs a Full TeX Install")
+			Text("Needs XeLaTeX")
 				.font(.headline)
-			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. The bundled TinyTeX only provides pdflatex — install a full TeX distribution such as MacTeX, or switch every font back to a built-in one in Edit Fonts, Page Numbers, and Configure Footnotes.")
+			Text("This document uses a system or variable font, which needs XeLaTeX or LuaLaTeX to typeset. Add that to your TinyTeX install, or switch every font back to a built-in one in Edit Fonts, Page Numbers, and Configure Footnotes.")
 				.font(.caption)
 				.foregroundColor(.secondary)
 				.multilineTextAlignment(.center)
 				.frame(maxWidth: 340)
-			Link("Get MacTeX…", destination: URL(string: "https://tug.org/mactex/")!)
-				.font(.caption)
-			Button("Try Again") {
-				typeset()
+			if installer.isInstalling {
+				ProgressView(installer.statusText)
+			} else {
+				Button("Install XeLaTeX Support") {
+					installer.installXeLaTeXSupport {
+						typeset()
+					}
+				}
+				.keyboardShortcut(.defaultAction)
+				Link("Get MacTeX instead…", destination: URL(string: "https://tug.org/mactex/")!)
+					.font(.caption)
 			}
-			.keyboardShortcut(.defaultAction)
+			if let error = installer.errorMessage {
+				Text(error)
+					.font(.caption)
+					.foregroundColor(.red)
+					.multilineTextAlignment(.center)
+					.frame(maxWidth: 340)
+			}
 		}
 		.padding(20)
 		.frame(maxWidth: .infinity, maxHeight: .infinity)
