@@ -34,6 +34,7 @@
 		AB0000010000000000000127 /* CrossReferenceInsertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000027 /* CrossReferenceInsertView.swift */; };
 		AB0000010000000000000128 /* TOCSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000028 /* TOCSettings.swift */; };
 		AB0000010000000000000129 /* TOCBuilderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000029 /* TOCBuilderView.swift */; };
+		AB0000010000000000000130 /* CanvasScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000010000000000000030 /* CanvasScrollView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +66,7 @@
 		AB0000010000000000000027 /* CrossReferenceInsertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CrossReferenceInsertView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000028 /* TOCSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCSettings.swift; sourceTree = "<group>"; };
 		AB0000010000000000000029 /* TOCBuilderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOCBuilderView.swift; sourceTree = "<group>"; };
+		AB0000010000000000000030 /* CanvasScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CanvasScrollView.swift; sourceTree = "<group>"; };
 		AB0000010000000000000009 /* Bookmaker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Bookmaker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -117,6 +119,7 @@
 				AB0000010000000000000027 /* CrossReferenceInsertView.swift */,
 				AB0000010000000000000028 /* TOCSettings.swift */,
 				AB0000010000000000000029 /* TOCBuilderView.swift */,
+				AB0000010000000000000030 /* CanvasScrollView.swift */,
 				AB0000010000000000000008 /* Info.plist */,
 			);
 			path = Bookmaker;
@@ -225,6 +228,7 @@
 				AB0000010000000000000127 /* CrossReferenceInsertView.swift in Sources */,
 				AB0000010000000000000128 /* TOCSettings.swift in Sources */,
 				AB0000010000000000000129 /* TOCBuilderView.swift in Sources */,
+				AB0000010000000000000130 /* CanvasScrollView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

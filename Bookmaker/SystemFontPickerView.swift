@@ -18,9 +18,11 @@ struct SystemFontPickerView: View {
 			familyList
 				.frame(minWidth: 220, maxWidth: 280)
 			detail
-				.frame(minWidth: 360, maxWidth: .infinity)
+				.frame(minWidth: 460, maxWidth: .infinity)
 		}
-		.frame(minHeight: 420)
+		// wide enough that a variable font's axis sliders (420pt by default,
+		// widened further via their own resize handle) aren't cut off
+		.frame(minWidth: 760, minHeight: 480)
 		.onAppear {
 			familyNames = SystemFontCatalog.familyNames()
 		}
@@ -76,7 +78,9 @@ struct SystemFontPickerView: View {
 				}
 				if let face = selectedFace {
 					if face.isVariable, !face.axes.isEmpty {
-						ScrollView {
+						// horizontal scroll too, so widening the sliders via their own
+						// resize handle beyond the sheet's width stays reachable
+						ScrollView([.horizontal, .vertical]) {
 							VariableFontAxesView(axes: face.axes, values: $axisValues)
 								.padding(.vertical, 8)
 						}
