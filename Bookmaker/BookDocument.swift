@@ -24,15 +24,16 @@ struct PageSettings: Codable, Equatable {
 enum DefaultTemplates {
 	/// Wrapper for the whole book: document class, page geometry, running headers.
 	/// Placeholders: {{GEOMETRY}} (from page settings), {{FONTENCODING}} (fontenc or
-	/// fontspec, decided document-wide), {{FONTS}} (from font settings), {{PAGENUMBERS}}
-	/// (from page number settings), {{FOOTNOTES}} (from footnote settings),
+	/// fontspec, decided document-wide), {{TEXTSTYLES}} (from the text styles
+	/// catalog — font/size/color for every text type), {{PAGENUMBERS}} (from
+	/// page number settings), {{FOOTNOTES}} (from footnote settings),
 	/// {{CROSSREFERENCES}} (from cross-reference settings, only when the body
 	/// actually uses one), {{TOC}} (TOC template), {{BODY}} (body text).
 	static let spread = #"""
 	\documentclass[11pt,twoside,openright]{book}
 	{{FONTENCODING}}
 	\usepackage[{{GEOMETRY}}]{geometry}
-	{{FONTS}}
+	{{TEXTSTYLES}}
 	{{FOOTNOTES}}
 	{{CROSSREFERENCES}}
 	% running heads with page numbers, built into the book class;
@@ -91,7 +92,7 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	static var readableContentTypes: [UTType] { [.bookmakerBook] }
 
 	var settings = PageSettings()
-	var fonts = FontSettings()
+	var textStyles = TextStylesCatalog()
 	var pageNumbers = PageNumberSettings()
 	var footnotes = FootnoteSettings()
 	var crossReferences = CrossReferenceSettings()
@@ -103,14 +104,77 @@ struct BookDocument: FileDocument, Codable, Equatable {
 	init() {}
 
 	private enum CodingKeys: String, CodingKey {
-		case settings, fonts, pageNumbers, footnotes, crossReferences, tocBuilder, spreadTemplate, tocTemplate, bodyText
+		case settings, textStyles, pageNumbers, footnotes, crossReferences, tocBuilder, spreadTemplate, tocTemplate, bodyText
+	}
+
+	/// Documents saved before "Edit Styles…" existed stored font choices
+	/// separately per feature (`fonts.bodyFont`/`headingFont`/`captionFont`,
+	/// `footnotes.font`, `pageNumbers.font`/`fontSize`). Reading those root
+	/// keys directly (bypassing the now font-less current structs) migrates
+	/// them into the new catalog on first open.
+	private enum LegacyRootKeys: String, CodingKey {
+		case fonts, footnotes, pageNumbers
+	}
+
+	private struct LegacyFontSettings: Decodable {
+		var bodyFont: FontSelection?
+		var headingFont: FontSelection?
+		var captionFont: FontSelection?
+	}
+
+	private struct LegacyFootnoteFont: Decodable {
+		var font: FontSelection?
+	}
+
+	private struct LegacyPageNumberFont: Decodable {
+		var font: FontSelection?
+		var fontSize: Double?
+	}
+
+	private static func migrateLegacyTextStyles(_ decoder: Decoder) -> TextStylesCatalog {
+		var catalog = TextStylesCatalog()
+		guard let legacyRoot = try? decoder.container(keyedBy: LegacyRootKeys.self) else {
+			return catalog
+		}
+		if let legacyFonts = try? legacyRoot.decodeIfPresent(LegacyFontSettings.self, forKey: .fonts) {
+			if let bodyFont = legacyFonts.bodyFont, bodyFont != .builtin(.computerModern) {
+				catalog.body = .partial(PartialStyle(fontOverride: bodyFont))
+			}
+			if let headingFont = legacyFonts.headingFont, headingFont != .builtin(.computerModern) {
+				catalog.heading = .partial(PartialStyle(fontOverride: headingFont))
+			}
+			if let captionFont = legacyFonts.captionFont, captionFont != .builtin(.computerModern) {
+				catalog.caption = .partial(PartialStyle(fontOverride: captionFont))
+			}
+		}
+		if let legacyFootnote = try? legacyRoot.decodeIfPresent(LegacyFootnoteFont.self, forKey: .footnotes),
+		   let font = legacyFootnote.font, font != .builtin(.computerModern) {
+			catalog.footnote = .partial(PartialStyle(fontOverride: font))
+		}
+		if let legacyPageNumber = try? legacyRoot.decodeIfPresent(LegacyPageNumberFont.self, forKey: .pageNumbers) {
+			var partial = PartialStyle()
+			if let font = legacyPageNumber.font, font != .builtin(.computerModern) {
+				partial.fontOverride = font
+			}
+			if let size = legacyPageNumber.fontSize, size != 10 {
+				partial.sizeAdjustment = .absolute(size)
+			}
+			if partial.isCustomized {
+				catalog.pageNumber = .partial(partial)
+			}
+		}
+		return catalog
 	}
 
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		settings = try container.decode(PageSettings.self, forKey: .settings)
 		// documents saved before these settings existed simply have no such key
-		fonts = try container.decodeIfPresent(FontSettings.self, forKey: .fonts) ?? FontSettings()
+		if let existingStyles = try? container.decodeIfPresent(TextStylesCatalog.self, forKey: .textStyles) {
+			textStyles = existingStyles
+		} else {
+			textStyles = Self.migrateLegacyTextStyles(decoder)
+		}
 		pageNumbers = try container.decodeIfPresent(PageNumberSettings.self, forKey: .pageNumbers) ?? PageNumberSettings()
 		footnotes = try container.decodeIfPresent(FootnoteSettings.self, forKey: .footnotes) ?? FootnoteSettings()
 		crossReferences = try container.decodeIfPresent(CrossReferenceSettings.self, forKey: .crossReferences) ?? CrossReferenceSettings()
@@ -133,12 +197,11 @@ struct BookDocument: FileDocument, Codable, Equatable {
 		return FileWrapper(regularFileWithContents: try encoder.encode(self))
 	}
 
-	/// True when any chosen font (body/heading/caption, the page number
-	/// font, or the footnote font) is a system font rather than a curated
-	/// pdflatex-safe one, which pdflatex cannot render — compilation must
-	/// switch to XeLaTeX.
+	/// True when any text style's chosen font is a system font rather than
+	/// a curated pdflatex-safe one, which pdflatex cannot render —
+	/// compilation must switch to XeLaTeX.
 	var requiresXeLaTeX: Bool {
-		fonts.usesSystemFont || pageNumbers.usesSystemFont || footnotes.usesSystemFont
+		textStyles.usesSystemFont
 	}
 
 	/// True when the body text actually uses a varioref command, so the
@@ -156,8 +219,8 @@ struct BookDocument: FileDocument, Codable, Equatable {
 			.replacingOccurrences(of: "{{BODY}}", with: bodyText)
 			.replacingOccurrences(of: "{{GEOMETRY}}", with: settings.geometryOptions + pageNumbers.geometryExtras)
 			.replacingOccurrences(of: "{{FONTENCODING}}", with: fontEncoding)
-			.replacingOccurrences(of: "{{FONTS}}", with: fonts.preamble)
-			.replacingOccurrences(of: "{{FOOTNOTES}}", with: footnotes.preamble)
+			.replacingOccurrences(of: "{{TEXTSTYLES}}", with: textStyles.preamble)
+			.replacingOccurrences(of: "{{FOOTNOTES}}", with: footnotes.preamble(styleIsCustomized: textStyles.footnote.isCustomized))
 			.replacingOccurrences(of: "{{CROSSREFERENCES}}", with: usesCrossReferences ? crossReferences.preamble : "")
 			.replacingOccurrences(of: "{{PAGENUMBERS}}", with: pageNumbers.preamble)
 	}

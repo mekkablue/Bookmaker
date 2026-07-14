@@ -12,7 +12,7 @@ struct ShowPageSetupKey: FocusedValueKey {
 	typealias Value = Binding<Bool>
 }
 
-struct ShowFontSettingsKey: FocusedValueKey {
+struct ShowEditStylesKey: FocusedValueKey {
 	typealias Value = Binding<Bool>
 }
 
@@ -60,9 +60,9 @@ extension FocusedValues {
 		set { self[ShowPageSetupKey.self] = newValue }
 	}
 
-	var showFontSettings: ShowFontSettingsKey.Value? {
-		get { self[ShowFontSettingsKey.self] }
-		set { self[ShowFontSettingsKey.self] = newValue }
+	var showEditStyles: ShowEditStylesKey.Value? {
+		get { self[ShowEditStylesKey.self] }
+		set { self[ShowEditStylesKey.self] = newValue }
 	}
 
 	var autoTypeset: AutoTypesetKey.Value? {
@@ -106,7 +106,7 @@ struct BookmakerCommands: Commands {
 	@FocusedValue(\.typesetAction) private var typesetAction
 	@FocusedValue(\.showPreview) private var showPreview
 	@FocusedValue(\.showPageSetup) private var showPageSetup
-	@FocusedValue(\.showFontSettings) private var showFontSettings
+	@FocusedValue(\.showEditStyles) private var showEditStyles
 	@FocusedValue(\.autoTypeset) private var autoTypeset
 	@FocusedValue(\.insertFootnoteAction) private var insertFootnoteAction
 	@FocusedValue(\.showFootnoteSettings) private var showFootnoteSettings
@@ -129,11 +129,11 @@ struct BookmakerCommands: Commands {
 			.keyboardShortcut("m", modifiers: [.command, .option])
 			.disabled(showPageSetup == nil)
 
-			Button("Edit Fonts…") {
-				showFontSettings?.wrappedValue = true
+			Button("Edit Styles…") {
+				showEditStyles?.wrappedValue = true
 			}
 			.keyboardShortcut("f", modifiers: [.command, .option])
-			.disabled(showFontSettings == nil)
+			.disabled(showEditStyles == nil)
 
 			Button("Configure Footnotes…") {
 				showFootnoteSettings?.wrappedValue = true
